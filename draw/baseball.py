@@ -23,47 +23,47 @@ def bounding(coord1, coord2):
     return (coord1[0], coord1[1], coord2[0], coord2[1])
 
 def draw_diamond(draw):
-    draw.line([coord_4(2,1), coord_4(3,2)], fill=128) # Home - 1st
-    draw.line([coord_4(3,2), coord_4(2,3)], fill=128) #  1st - 2nd
-    draw.line([coord_4(2,3), coord_4(1,2)], fill=128) #  2nd - 3rd
-    draw.line([coord_4(1,2), coord_4(2,1)], fill=128) #  3rd - Home
+    draw.line([coord_4(2,1), coord_4(3,2)], width=4) # Home - 1st
+    draw.line([coord_4(3,2), coord_4(2,3)], width=4) #  1st - 2nd
+    draw.line([coord_4(2,3), coord_4(1,2)], width=4) #  2nd - 3rd
+    draw.line([coord_4(1,2), coord_4(2,1)], width=4) #  3rd - Home
 
     draw.ellipse(bounding(_coord(19,21,40), _coord(21,19,40)), outline=128)
 
 def draw_count(draw):
-    draw.line([coord_10(7,1), coord_10(10,1)], fill=128)
-    draw.line([coord_10(8,2), coord_10(10,2)], fill=128)
-    draw.line([coord_10(9,0), coord_10(9, 2)], fill=128)
-    draw.line([coord_10(8,0), coord_10(8, 2)], fill=128)
-    draw.line([coord_10(7,0), coord_10(7, 1)], fill=128)
+    draw.line([coord_10(7,1), coord_10(10,1)], width=4)
+    draw.line([coord_10(8,2), coord_10(10,2)], width=4)
+    draw.line([coord_10(9,0), coord_10(9, 2)], width=4)
+    draw.line([coord_10(8,0), coord_10(8, 2)], width=4)
+    draw.line([coord_10(7,0), coord_10(7, 1)], width=4)
 
-    draw.line([coord_10(0,2), coord_10(2,2)], fill=128)
-    draw.line([coord_10(2,0), coord_10(2,2)], fill=128)
+    draw.line([coord_10(0,2), coord_10(2,2)], width=4)
+    draw.line([coord_10(2,0), coord_10(2,2)], width=4)
 
-    draw.line([coord_10(1,9), coord_10(5,9)], fill=128)
-    draw.line([coord_10(6,9), coord_10(9,9)], fill=128)
+    draw.line([coord_10(1,9), coord_10(5,9)], width=4)
+    draw.line([coord_10(6,9), coord_10(9,9)], width=4)
 
-    draw.line([coord_10(1,9), coord_10(1,10)], fill=128)
-    draw.line([coord_10(2,9), coord_10(2,10)], fill=128)
-    draw.line([coord_10(3,9), coord_10(3,10)], fill=128)
-    draw.line([coord_10(4,9), coord_10(4,10)], fill=128)
-    draw.line([coord_10(5,9), coord_10(5,10)], fill=128)
-    draw.line([coord_10(6,9), coord_10(6,10)], fill=128)
-    draw.line([coord_10(7,9), coord_10(7,10)], fill=128)
-    draw.line([coord_10(8,9), coord_10(8,10)], fill=128)
-    draw.line([coord_10(9,9), coord_10(9,10)], fill=128)
+    draw.line([coord_10(1,9), coord_10(1,10)], width=4)
+    draw.line([coord_10(2,9), coord_10(2,10)], width=4)
+    draw.line([coord_10(3,9), coord_10(3,10)], width=4)
+    draw.line([coord_10(4,9), coord_10(4,10)], width=4)
+    draw.line([coord_10(5,9), coord_10(5,10)], width=4)
+    draw.line([coord_10(6,9), coord_10(6,10)], width=4)
+    draw.line([coord_10(7,9), coord_10(7,10)], width=4)
+    draw.line([coord_10(8,9), coord_10(8,10)], width=4)
+    draw.line([coord_10(9,9), coord_10(9,10)], width=4)
 
 def write_bats(draw):
     font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 25)
     font2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
-    draw.text(coord_100(11,99), 'HR', font=font, fill=128)
-    draw.text(coord_100(21,99), '3B', font=font, fill=128)
-    draw.text(coord_100(31,99), '2B', font=font, fill=128)
-    draw.text(coord_100(41,99), '1B', font=font, fill=128)
+    draw.text(coord_100(11,99), 'HR', font=font)
+    draw.text(coord_100(21,99), '3B', font=font)
+    draw.text(coord_100(31,99), '2B', font=font)
+    draw.text(coord_100(41,99), '1B', font=font)
 
-    draw.text(coord_100(61,99), 'BB', font=font, fill=128)
-    draw.text(coord_100(71,98), 'SAC', font=font2, fill=128)
-    draw.text(coord_100(81,99), 'HP', font=font, fill=128)
+    draw.text(coord_100(61,99), 'BB', font=font)
+    draw.text(coord_100(71,98), 'SAC', font=font2)
+    draw.text(coord_100(81,99), 'HP', font=font)
 
 def home_first(draw):
     draw.line([coord_4(2,1), coord_4(3,2)], width=6)
