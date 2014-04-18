@@ -1,6 +1,6 @@
-import Image
-import ImageDraw
-import ImageFont
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 import sys
 
 def _coord(x, y, frac):
@@ -123,6 +123,13 @@ def out_at_home(draw):
     draw.line([coord_20(5,10), coord_20(8,7)], width=6)
     draw.line([coord_20(7,6), coord_20(9,8)], width=3)
 
+def big_out(draw, play):
+    font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 100)
+    img_w = image.size[0]/2
+    width = draw.textsize(play, font=font)[0]/2
+    # print draw.textsize(play, font=font)[1]
+    draw.text((img_w-width, img_w-50), play, font=font)
+
 def strikes(draw, num):
     for i in xrange(num):
         draw.line([coord_10(10-i,1), coord_10(9-i,2)])
@@ -141,9 +148,11 @@ def draw_box(draw):
 def main(image):
     draw = ImageDraw.Draw(image)
     draw_box(draw)
+    big_out(draw, '6-3')
     del draw
 
 if __name__ == '__main__':
-    image = Image.open('blank.png')
+    image = Image.open('draw/blank.bmp')
     main(image)
-    image.save('test.png')
+    image = image.convert('RGB')
+    image.save('draw/test.bmp')

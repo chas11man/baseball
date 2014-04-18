@@ -93,6 +93,7 @@ def init_data():
                     setOutCell(sheets[0], 2, 2, umpire.attrib['name'])
                     setOutCell(sheets[1], 2, 2, umpire.attrib['name'])
 
+    sheets[1].insert_bitmap('draw/test.bmp', 4, 3)
     workbook.save('simple.xls')
 
 def count_at_bats(player_id):
