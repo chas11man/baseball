@@ -1,6 +1,20 @@
 from PIL import Image, ImageDraw, ImageFont
 import sys, os
 
+global image
+global draw
+
+def open_draw():
+    global image
+    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.png'))
+    global draw
+    draw = ImageDraw.Draw(image)
+
+def close_draw(file_name='test.png'):
+    global draw
+    del draw
+    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name))
+
 def _coord(x, y, frac):
     div = image.size[0]/frac
     return (div*x, div*(frac-y))
@@ -104,11 +118,15 @@ def out_at_home(scoring, num):
     out(num)
 
 def strikes(num):
+    if num > 2:
+        num = 2
     for i in xrange(num):
         draw.line([coord_10(10-i,1), coord_10(9-i,2)])
         draw.line([coord_10(9-i,1), coord_10(10-i,2)])
 
 def balls(num):
+    if num > 3:
+        num = 3
     for i in xrange(num):
         draw.line([coord_10(10-i,0), coord_10(9-i,1)])
         draw.line([coord_10(9-i,0), coord_10(10-i,1)])
@@ -121,8 +139,6 @@ def main():
     draw_box()
 
 if __name__ == '__main__':
-    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.png'))
-    draw = ImageDraw.Draw(image)
+    open_draw()
     main()
-    del draw
-    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test.png'))
+    close_draw()

@@ -1,4 +1,6 @@
 from datetime import date, timedelta
+from draw import baseball
+from sets import Set
 import xml.etree.ElementTree as ET
 import sys
 import argparse
@@ -32,6 +34,13 @@ class Game(object):
 		self.away = away
 		self.location = location
 
+def pos(string):
+	if string == 'first baseman':
+		return 3
+	elif string == 'third baseman':
+		return 5
+	else:
+		return 0
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='options')
@@ -63,4 +72,43 @@ if __name__ == '__main__':
 		elif a['type'] == 'away':
 			away = t
 	g = Game(home, away, location)
-	print vars(home)
+
+	game_events_response = urllib2.urlopen(game_url + 'game_events.xml')
+	print game_url + 'game_events.xml'
+	game_events_xml = game_events_response.read()
+	game_events_root = ET.fromstring(game_events_xml)
+
+	atbat = game_events_root[0][0][2]
+	events = Set()
+	for bat in game_events_root.iter('atbat'):
+		events.add(bat.attrib['event'])
+	print events
+
+	baseball.open_draw()
+	baseball.main()
+	baseball.strikes(int(atbat.attrib['s']))
+	baseball.balls(int(atbat.attrib['b']))
+
+	e = atbat.attrib['event']
+	if e == 'Strikeout':
+		baseball.big_out('K', int(atbat.attrib['o']))
+	elif e == 'Single':
+		baseball.home_first('1B')
+	elif e == 'Double':
+		baseball.home_first()
+		baseball.first_second('2B')
+	elif e == 'Triple':
+		baseball.home_first()
+		baseball.first_second()
+		baseball.second_third('3B')
+	elif e == 'Home Run':
+		baseball.home_first()
+		baseball.first_second()
+		baseball.second_third()
+		baseball.third_home('HR')
+	elif e == 'Groundout':
+		r = re.compile('([A-Za-z\s]+) grounds out, ([a-z\s]+) ([A-Za-z\s]+) to ([a-z\s]+) ([A-Za-z\s]+).*')
+		m = r.match(atbat.attrib['des'])
+		baseball.big_out('%d-%d' % (pos(m.group(2)), pos(m.group(4))) , int(atbat.attrib['o']))
+
+	baseball.close_draw()
