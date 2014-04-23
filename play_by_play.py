@@ -58,6 +58,81 @@ def pos(string):
 	else:
 		return 0
 
+def parse_play(atbat, box):
+	e = atbat.attrib['event']
+	if e == 'Strikeout':
+		box.big_out('K', int(atbat.attrib['o']))
+	elif e == 'Walk':
+		box.home_first('BB')
+	elif e == 'Hit By Pitch':
+		box.home_first('HBP')
+	elif e == 'Single':
+		box.home_first('1B')
+	elif e == 'Double':
+		box.home_first()
+		box.first_second('2B')
+	elif e == 'Triple':
+		box.home_first()
+		box.first_second()
+		box.second_third('3B')
+	elif e == 'Home Run':
+		box.home_first()
+		box.first_second()
+		box.second_third()
+		box.third_home('HR')
+		box.score()
+	elif e == 'Groundout' or e == 'Bunt Groundout':
+		r = re.compile('([A-Za-z\s\.]+)( bunt)? grounds out(,| sharply,| softly,) ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.big_out('%d-%d' % (pos(m.group(4)), pos(m.group(6))) , int(atbat.attrib['o']))
+		else:
+			r = re.compile('([A-Za-z\s\.]+) grounds out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+			m = r.match(atbat.attrib['des'])
+			if m:
+				box.big_out('%dU' % pos(m.group(3)), int(atbat.attrib['o']))
+	elif e == 'Grounded Into DP':
+		r = re.compile('([A-Za-z\s\.]+) grounds into a double play, ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.big_out('%d-%d-%d' % (pos(m.group(2)), pos(m.group(4)), pos(m.group(6))), int(atbat.attrib['o']))
+	elif e == 'Flyout':
+		r = re.compile('([A-Za-z\s\.]+) flies out to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.big_out('F%d' % pos(m.group(2)), int(atbat.attrib['o']))
+	elif e == 'Lineout':
+		r = re.compile('([A-Za-z\s\.]+) lines out (sharply )?to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.big_out('L%d' % pos(m.group(3)), int(atbat.attrib['o']))
+	elif e == 'Pop Out':
+		r = re.compile('([A-Za-z\s\.]+) pops out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.big_out('P%d' % pos(m.group(3)), int(atbat.attrib['o']))
+	elif e == 'Field Error':
+		r = re.compile('[A-Za-z\s]+ error by ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
+		m = r.match(atbat.attrib['des'])
+		if m:
+			box.home_first('E%d' % pos(m.group(1)))
+
+	if atbat.attrib['b2'] and atbat.attrib['b2'] != atbat.attrib['batter']:
+		try:
+			runner2 = boxes[inning_num][half.tag][atbat.attrib['b2']]
+			ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+			boxes[inning_num][half.tag][atbat.attrib['b2']][ab].first_second(get_player(id=atbat.attrib['batter']).num)
+		except KeyError:
+			pass
+
+	if atbat.attrib['b3'] and atbat.attrib['b3'] != atbat.attrib['batter']:
+		try:
+			runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
+			ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+			boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
+		except KeyError:
+			pass
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='options')
 	yes = date.today()-timedelta(days=1)
@@ -124,69 +199,20 @@ if __name__ == '__main__':
 
 						box.strikes(int(atbat.attrib['s']))
 						box.balls(int(atbat.attrib['b']))
+						clean = re.sub(' +', ' ', atbat.attrib['des'])
+						split = clean.split()
+						re_name = re.compile('([A-Z][A-Za-z\.]+ )+')
+						m = re_name.match(clean)
 
-						e = atbat.attrib['event']
-						if e == 'Strikeout':
-							box.big_out('K', int(atbat.attrib['o']))
-						elif e == 'Walk':
-							box.home_first('BB')
-						elif e == 'Hit By Pitch':
-							box.home_first('HBP')
-						elif e == 'Single':
-							box.home_first('1B')
-						elif e == 'Double':
-							box.home_first()
-							box.first_second('2B')
-						elif e == 'Triple':
-							box.home_first()
-							box.first_second()
-							box.second_third('3B')
-						elif e == 'Home Run':
-							box.home_first()
-							box.first_second()
-							box.second_third()
-							box.third_home('HR')
-							box.score()
-						elif e == 'Groundout' or e == 'Bunt Groundout':
-							r = re.compile('([A-Za-z\s\.]+)( bunt)? grounds out(,| sharply,| softly,) ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-							m = r.match(atbat.attrib['des'])
-							if m:
-								box.big_out('%d-%d' % (pos(m.group(4)), pos(m.group(6))) , int(atbat.attrib['o']))
-							else:
-								r = re.compile('([A-Za-z\s\.]+) grounds out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-								m = r.match(atbat.attrib['des'])
-								if m:
-									box.big_out('%dU' % pos(m.group(3)), int(atbat.attrib['o']))
-						elif e == 'Flyout':
-							r = re.compile('([A-Za-z\s\.]+) flies out to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-							m = r.match(atbat.attrib['des'])
-							if m:
-								box.big_out('F%d' % pos(m.group(2)), int(atbat.attrib['o']))
-						elif e == 'Lineout':
-							r = re.compile('([A-Za-z\s\.]+) lines out (sharply )?to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-							m = r.match(atbat.attrib['des'])
-							if m:
-								box.big_out('L%d' % pos(m.group(3)), int(atbat.attrib['o']))
-						elif e == 'Pop Out':
-							r = re.compile('([A-Za-z\s\.]+) pops out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-							m = r.match(atbat.attrib['des'])
-							if m:
-								box.big_out('P%d' % pos(m.group(3)), int(atbat.attrib['o']))
-						elif e == 'Field Error':
-							r = re.compile('[A-Za-z\s]+ error by ([a-z\s]+) ([A-Za-z\s\.]+).*')
-							m = r.match(atbat.attrib['des'])
-							if m:
-								box.home_first('E%d' % pos(m.group(1)))
+						# if 'walks.' in split:
+						# 	print 'walk', split
+						# if m:
+						# 	print m.group()
+						# 	print re_name.sub('', clean)
 
-						if atbat.attrib['b2'] and atbat.attrib['b2'] != atbat.attrib['batter']:
-							runner2 = boxes[inning_num][half.tag][atbat.attrib['b2']]
-							ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
-							boxes[inning_num][half.tag][atbat.attrib['b2']][ab].first_second(get_player(id=atbat.attrib['batter']).num)
 
-						if atbat.attrib['b3'] and atbat.attrib['b3'] != atbat.attrib['batter']:
-							runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
-							ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
-							boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
+
+						parse_play(atbat, box)
 
 	for inn,halves in boxes.items():
 		for half,batters in halves.items():
@@ -205,9 +231,6 @@ if __name__ == '__main__':
 					if not os.path.exists(dir_path):
 						os.makedirs(dir_path)
 
-					#print 'saving %s' % file_path
+					# print 'saving %s' % file_path
 
 					box.save(file_name=file_path)
-	import pprint
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(boxes)
