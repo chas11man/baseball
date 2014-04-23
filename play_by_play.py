@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from draw import baseball
+from draw.baseball import ScoreBox
 from sets import Set
 import xml.etree.ElementTree as ET
 import sys, os
@@ -92,74 +92,94 @@ if __name__ == '__main__':
 	game_events_xml = game_events_response.read()
 	game_events_root = ET.fromstring(game_events_xml)
 
+	boxes = {}
+
 	for inning in game_events_root:
-		for half in inning:
-			for atbat in half:
-				if atbat.tag == 'atbat':
-					events = Set()
-					for bat in game_events_root.iter('atbat'):
-						events.add(bat.attrib['event'])
+		if inning.tag == 'inning':
+			inning_num = int(inning.attrib['num'])
+			boxes.update({inning_num: {}})
+			for half in inning:
+				boxes[inning_num].update({half.tag: {}})
+				for atbat in half:
+					if atbat.tag == 'atbat':
+						boxes[inning_num][half.tag].update({atbat.attrib['num']: ScoreBox()})
+						box = boxes[inning_num][half.tag][atbat.attrib['num']]
 
-					baseball.open_draw()
-					baseball.main()
-					baseball.strikes(int(atbat.attrib['s']))
-					baseball.balls(int(atbat.attrib['b']))
+						box.strikes(int(atbat.attrib['s']))
+						box.balls(int(atbat.attrib['b']))
 
-					e = atbat.attrib['event']
-					if e == 'Strikeout':
-						baseball.big_out('K', int(atbat.attrib['o']))
-					elif e == 'Walk':
-						baseball.home_first('BB')
-					elif e == 'Hit By Pitch':
-						baseball.home_first('HBP')
-					elif e == 'Single':
-						baseball.home_first('1B')
-					elif e == 'Double':
-						baseball.home_first()
-						baseball.first_second('2B')
-					elif e == 'Triple':
-						baseball.home_first()
-						baseball.first_second()
-						baseball.second_third('3B')
-					elif e == 'Home Run':
-						baseball.home_first()
-						baseball.first_second()
-						baseball.second_third()
-						baseball.third_home('HR')
-						baseball.score()
-					elif e == 'Groundout' or e == 'Bunt Groundout':
-						r = re.compile('([A-Za-z\s\.]+)( bunt)? grounds out(,| sharply,| softly,) ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-						m = r.match(atbat.attrib['des'])
-						if m:
-							baseball.big_out('%d-%d' % (pos(m.group(4)), pos(m.group(6))) , int(atbat.attrib['o']))
-						else:
-							r = re.compile('([A-Za-z\s\.]+) grounds out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
+						e = atbat.attrib['event']
+						if e == 'Strikeout':
+							box.big_out('K', int(atbat.attrib['o']))
+						elif e == 'Walk':
+							box.home_first('BB')
+						elif e == 'Hit By Pitch':
+							box.home_first('HBP')
+						elif e == 'Single':
+							box.home_first('1B')
+						elif e == 'Double':
+							box.home_first()
+							box.first_second('2B')
+						elif e == 'Triple':
+							box.home_first()
+							box.first_second()
+							box.second_third('3B')
+						elif e == 'Home Run':
+							box.home_first()
+							box.first_second()
+							box.second_third()
+							box.third_home('HR')
+							box.score()
+						elif e == 'Groundout' or e == 'Bunt Groundout':
+							r = re.compile('([A-Za-z\s\.]+)( bunt)? grounds out(,| sharply,| softly,) ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+).*')
 							m = r.match(atbat.attrib['des'])
 							if m:
-								baseball.big_out('%dU' % pos(m.group(3)), int(atbat.attrib['o']))
-					elif e == 'Flyout':
-						r = re.compile('([A-Za-z\s\.]+) flies out to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-						m = r.match(atbat.attrib['des'])
-						if m:
-							baseball.big_out('F%d' % pos(m.group(2)), int(atbat.attrib['o']))
-					elif e == 'Lineout':
-						r = re.compile('([A-Za-z\s\.]+) lines out (sharply )?to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-						m = r.match(atbat.attrib['des'])
-						if m:
-							baseball.big_out('L%d' % pos(m.group(3)), int(atbat.attrib['o']))
-					elif e == 'Pop Out':
-						r = re.compile('([A-Za-z\s\.]+) pops out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
-						m = r.match(atbat.attrib['des'])
-						if m:
-							baseball.big_out('P%d' % pos(m.group(3)), int(atbat.attrib['o']))
-					elif e == 'Field Error':
-						r = re.compile('[A-Za-z\s]+ error by ([a-z\s]+) ([A-Za-z\s\.]+).*')
-						m = r.match(atbat.attrib['des'])
-						if m:
-							baseball.home_first('E%d' % pos(m.group(1)))
+								box.big_out('%d-%d' % (pos(m.group(4)), pos(m.group(6))) , int(atbat.attrib['o']))
+							else:
+								r = re.compile('([A-Za-z\s\.]+) grounds out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
+								m = r.match(atbat.attrib['des'])
+								if m:
+									box.big_out('%dU' % pos(m.group(3)), int(atbat.attrib['o']))
+						elif e == 'Flyout':
+							r = re.compile('([A-Za-z\s\.]+) flies out to ([a-z\s]+) ([A-Za-z\s\.]+).*')
+							m = r.match(atbat.attrib['des'])
+							if m:
+								box.big_out('F%d' % pos(m.group(2)), int(atbat.attrib['o']))
+						elif e == 'Lineout':
+							r = re.compile('([A-Za-z\s\.]+) lines out (sharply )?to ([a-z\s]+) ([A-Za-z\s\.]+).*')
+							m = r.match(atbat.attrib['des'])
+							if m:
+								box.big_out('L%d' % pos(m.group(3)), int(atbat.attrib['o']))
+						elif e == 'Pop Out':
+							r = re.compile('([A-Za-z\s\.]+) pops out( softly)? to ([a-z\s]+) ([A-Za-z\s\.]+).*')
+							m = r.match(atbat.attrib['des'])
+							if m:
+								box.big_out('P%d' % pos(m.group(3)), int(atbat.attrib['o']))
+						elif e == 'Field Error':
+							r = re.compile('[A-Za-z\s]+ error by ([a-z\s]+) ([A-Za-z\s\.]+).*')
+							m = r.match(atbat.attrib['des'])
+							if m:
+								box.home_first('E%d' % pos(m.group(1)))
 
-					args.update({'inn': inning.attrib['num'], 'half': half.tag, 'num': atbat.attrib['num'], 'home': home.abbrev, 'away': away.abbrev})
-					file_name = 'games/%(year)s_%(month)s_%(day)s/%(home)s_%(away)s/%(inn)s_%(half)s_%(num)s.bmp' % args
-					if not os.path.exists(os.path.dirname(file_name)):
-						os.makedirs(os.path.dirname(file_name))
-					baseball.close_draw(file_name=file_name)
+
+
+	for inn,halves in boxes.items():
+		for half,atbats in halves.items():
+			for ab,box in atbats.items():
+
+				args.update({'inn': str(inn).zfill(2), 'half': half, 'num': ab.zfill(3), 'home': home.abbrev, 'away': away.abbrev})
+
+				games_dir = 'games'
+				day_dir = '%(year)s_%(month)s_%(day)s' % args
+				teams_dir = '%(home)s_%(away)s' % args
+				image_name = '%(num)s_%(inn)s_%(half)s.bmp' % args
+
+				dir_path = os.path.abspath(os.path.join(games_dir, day_dir, teams_dir))
+				file_path = os.path.join(dir_path, image_name)
+
+				if not os.path.exists(dir_path):
+					os.makedirs(dir_path)
+
+				print 'saving %s' % file_path
+
+				box.save(file_name=file_path)
