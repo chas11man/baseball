@@ -6,14 +6,14 @@ global draw
 
 def open_draw():
     global image
-    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.png'))
+    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.bmp'))
     global draw
     draw = ImageDraw.Draw(image)
 
-def close_draw(file_name='test.png'):
+def close_draw(file_name='test.bmp'):
     global draw
     del draw
-    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name))
+    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', file_name))
 
 def _coord(x, y, frac):
     div = image.size[0]/frac
