@@ -1,7 +1,19 @@
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-import sys
+from PIL import Image, ImageDraw, ImageFont
+import sys, os
+
+global image
+global draw
+
+def open_draw():
+    global image
+    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.png'))
+    global draw
+    draw = ImageDraw.Draw(image)
+
+def close_draw(file_name='test.png'):
+    global draw
+    del draw
+    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name))
 
 def _coord(x, y, frac):
     div = image.size[0]/frac
@@ -22,137 +34,111 @@ def coord_100(x, y):
 def bounding(coord1, coord2):
     return (coord1[0], coord1[1], coord2[0], coord2[1])
 
-def draw_diamond(draw):
-    draw.line([coord_4(2,1), coord_4(3,2)], width=4) # Home - 1st
-    draw.line([coord_4(3,2), coord_4(2,3)], width=4) #  1st - 2nd
-    draw.line([coord_4(2,3), coord_4(1,2)], width=4) #  2nd - 3rd
-    draw.line([coord_4(1,2), coord_4(2,1)], width=4) #  3rd - Home
+def get_font(size):
+    return ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', size)
 
-    draw.ellipse(bounding(_coord(19,21,40), _coord(21,19,40)), outline=128)
+def play(scoring, base=1):
+    if base == 1:
+        c = coord_20(16,7)
+    elif base == 2:
+        c = coord_20(12,19)
+    elif base == 3:
+        c = coord_20(1,16)
+    else:
+        c = coord_20(5,3)
 
-def draw_count(draw):
-    draw.line([coord_10(7,1), coord_10(10,1)], width=4)
-    draw.line([coord_10(8,2), coord_10(10,2)], width=4)
-    draw.line([coord_10(9,0), coord_10(9, 2)], width=4)
-    draw.line([coord_10(8,0), coord_10(8, 2)], width=4)
-    draw.line([coord_10(7,0), coord_10(7, 1)], width=4)
+    font = get_font(40)
+    draw.text(c, str(scoring), font=font)
 
-    draw.line([coord_10(0,2), coord_10(2,2)], width=4)
-    draw.line([coord_10(2,0), coord_10(2,2)], width=4)
+def draw_diamond():
+    draw.line([coord_10(5,1), coord_10(9,5)], width=2, fill=128) # Home - 1st
+    draw.line([coord_10(9,5), coord_10(5,9)], width=2, fill=128) #  1st - 2nd
+    draw.line([coord_10(5,9), coord_10(1,5)], width=2, fill=128) #  2nd - 3rd
+    draw.line([coord_10(1,5), coord_10(5,1)], width=2, fill=128) #  3rd - Home
 
-    draw.line([coord_10(1,9), coord_10(5,9)], width=4)
-    draw.line([coord_10(6,9), coord_10(9,9)], width=4)
+def draw_count():
+    draw.line([coord_10(7,1), coord_10(10,1)], width=2, fill=64)
+    draw.line([coord_10(8,2), coord_10(10,2)], width=2, fill=64)
+    draw.line([coord_10(9,0), coord_10(9, 2)], width=2, fill=64)
+    draw.line([coord_10(8,0), coord_10(8, 2)], width=2, fill=64)
+    draw.line([coord_10(7,0), coord_10(7, 1)], width=2, fill=64)
 
-    draw.line([coord_10(1,9), coord_10(1,10)], width=4)
-    draw.line([coord_10(2,9), coord_10(2,10)], width=4)
-    draw.line([coord_10(3,9), coord_10(3,10)], width=4)
-    draw.line([coord_10(4,9), coord_10(4,10)], width=4)
-    draw.line([coord_10(5,9), coord_10(5,10)], width=4)
-    draw.line([coord_10(6,9), coord_10(6,10)], width=4)
-    draw.line([coord_10(7,9), coord_10(7,10)], width=4)
-    draw.line([coord_10(8,9), coord_10(8,10)], width=4)
-    draw.line([coord_10(9,9), coord_10(9,10)], width=4)
+    draw.line([coord_10(0,2), coord_10(2,2)], width=2, fill=64)
+    draw.line([coord_10(2,0), coord_10(2,2)], width=2, fill=64)
 
-def write_bats(draw):
-    font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 25)
-    font2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
-    draw.text(coord_100(11,99), 'HR', font=font)
-    draw.text(coord_100(21,99), '3B', font=font)
-    draw.text(coord_100(31,99), '2B', font=font)
-    draw.text(coord_100(41,99), '1B', font=font)
+def home_first(scoring=None):
+    draw.line([coord_10(5,1), coord_10(9,5)], width=8)
+    if scoring:
+        play(scoring, 1)
 
-    draw.text(coord_100(61,99), 'BB', font=font)
-    draw.text(coord_100(71,98), 'SAC', font=font2)
-    draw.text(coord_100(81,99), 'HP', font=font)
+def first_second(scoring=None):
+    draw.line([coord_10(9,5), coord_10(5,9)], width=8)
+    if scoring:
+        play(scoring, 2)
 
-def home_first(draw):
-    draw.line([coord_4(2,1), coord_4(3,2)], width=6)
+def second_third(scoring=None):
+    draw.line([coord_10(5,9), coord_10(1,5)], width=8)
+    if scoring:
+        play(scoring, 3)
 
-def first_second(draw):
-    draw.line([coord_4(3,2), coord_4(2,3)], width=6)
+def third_home(scoring=None):
+    draw.line([coord_10(1,5), coord_10(5,1)], width=8)
+    if scoring:
+        play(scoring, 4)
 
-def second_third(draw):
-    draw.line([coord_4(2,3), coord_4(1,2)], width=6)
+def score():
+    draw.polygon((coord_10(5,1), coord_10(9,5), coord_10(5,9), coord_10(1,5)), fill=100)
 
-def third_home(draw):
-    draw.line([coord_4(1,2), coord_4(2,1)], width=6)
+def big_out(scoring, num):
+    font = get_font(80)
+    width = font.getsize(scoring)[0]/2
+    draw.text((image.size[0]/2-width,image.size[1]*.4), scoring, font=font)
+    out(num)
 
-def score(draw):
-    draw.polygon((coord_4(2,1), coord_4(3,2), coord_4(2,3), coord_4(1,2)), fill=100)
+def out(num):
+    font = get_font(80)
+    draw.text(coord_20(1,4), str(num), font=font)
 
-def single(draw):
-    home_first(draw)
-    draw.line([coord_10(4,10), coord_10(5,9)])
-    draw.line([coord_10(5,10), coord_10(4,9)])
+def out_at_2nd(scoring, num):
+    draw.line([coord_10(9,5), coord_20(13,15)], width=8)
+    draw.line([coord_10(6,7), coord_10(7,8)], width=6)
+    play(scoring, 2)
+    out(num)
 
-def double(draw):
-    home_first(draw)
-    first_second(draw)
-    draw.line([coord_10(3,10), coord_10(4,9)])
-    draw.line([coord_10(4,10), coord_10(3,9)])
+def out_at_3rd(scoring, num):
+    draw.line([coord_10(5,9), coord_20(5,13)], width=8)
+    draw.line([coord_10(2,7), coord_10(3,6)], width=6)
+    play(scoring, 3)
+    out(num)
 
-def tripple(draw):
-    home_first(draw)
-    first_second(draw)
-    second_third(draw)
-    draw.line([coord_10(2,10), coord_10(3,9)])
-    draw.line([coord_10(3,10), coord_10(2,9)])
+def out_at_home(scoring, num):
+    draw.line([coord_10(1,5), coord_20(7,5)], width=8)
+    draw.line([coord_10(3,2), coord_10(4,3)], width=6)
+    play(scoring, 4)
+    out(num)
 
-def home_run(draw):
-    home_first(draw)
-    first_second(draw)
-    second_third(draw)
-    third_home(draw)
-    score(draw)
-    draw.line([coord_10(1,10), coord_10(2,9)])
-    draw.line([coord_10(2,10), coord_10(1,9)])
-
-def out_at_1st(draw):
-    draw.line([coord_20(10,5), coord_20(13,8)], width=6)
-    draw.line([coord_20(12,9), coord_20(14,7)], width=3)
-
-def out_at_2nd(draw):
-    draw.line([coord_20(15,10), coord_20(12,13)], width=6)
-    draw.line([coord_20(11,12), coord_20(13,14)], width=3)
-
-def out_at_3rd(draw):
-    draw.line([coord_20(10,15), coord_20(7,12)], width=6)
-    draw.line([coord_20(8,11), coord_20(6,13)], width=3)
-
-def out_at_home(draw):
-    draw.line([coord_20(5,10), coord_20(8,7)], width=6)
-    draw.line([coord_20(7,6), coord_20(9,8)], width=3)
-
-def big_out(draw, play):
-    font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 100)
-    img_w = image.size[0]/2
-    width = draw.textsize(play, font=font)[0]/2
-    # print draw.textsize(play, font=font)[1]
-    draw.text((img_w-width, img_w-50), play, font=font)
-
-def strikes(draw, num):
+def strikes(num):
+    if num > 2:
+        num = 2
     for i in xrange(num):
         draw.line([coord_10(10-i,1), coord_10(9-i,2)])
         draw.line([coord_10(9-i,1), coord_10(10-i,2)])
 
-def balls(draw, num):
+def balls(num):
+    if num > 3:
+        num = 3
     for i in xrange(num):
         draw.line([coord_10(10-i,0), coord_10(9-i,1)])
         draw.line([coord_10(9-i,0), coord_10(10-i,1)])
 
-def draw_box(draw):
-    draw_diamond(draw)
-    draw_count(draw)
-    write_bats(draw)
+def draw_box():
+    draw_diamond()
+    draw_count()
 
-def main(image):
-    draw = ImageDraw.Draw(image)
-    draw_box(draw)
-    big_out(draw, '6-3')
-    del draw
+def main():
+    draw_box()
 
 if __name__ == '__main__':
-    image = Image.open('draw/blank.bmp')
-    main(image)
-    image = image.convert('RGB')
-    image.save('draw/test.bmp')
+    open_draw()
+    main()
+    close_draw()
