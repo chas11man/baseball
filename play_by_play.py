@@ -18,12 +18,14 @@ class Team(object):
 		self.name_brief = name_brief
 
 class Player(object):
-	pass
-	#self.id
-	#self.num
-	#self.boxname
-	#self.position
-	#self.team
+	def __init__(self, id, num, box, pos, team, first, last):
+		self.id = id
+		self.num = num
+		self.boxname = box
+		self.position = pos
+		self.team = team
+		self.first = first
+		self.last = last
 
 class Play(object):
 	pass
@@ -92,6 +94,20 @@ if __name__ == '__main__':
 	game_events_xml = game_events_response.read()
 	game_events_root = ET.fromstring(game_events_xml)
 
+	players_response = urllib2.urlopen(game_url + 'players.xml')
+	players_xml = players_response.read()
+	players_root = ET.fromstring(players_xml)
+
+	def get_player(id=None, num=None, first=None, last=None):
+		for player in players_root.iter('player'):
+			a = player.attrib
+			if id == a['id'] or num == a['num'] or first == a['first'] or last == a['last']:
+				if a['parent_team_id'] == home.id:
+					t = home
+				else:
+					t = away
+				return Player(a['id'], a['num'], a['boxname'], a['current_position'], t, a['first'], a['last'])
+
 	boxes = {}
 
 	for inning in game_events_root:
@@ -102,8 +118,9 @@ if __name__ == '__main__':
 				boxes[inning_num].update({half.tag: {}})
 				for atbat in half:
 					if atbat.tag == 'atbat':
-						boxes[inning_num][half.tag].update({atbat.attrib['num']: ScoreBox()})
-						box = boxes[inning_num][half.tag][atbat.attrib['num']]
+						boxes[inning_num][half.tag].update({atbat.attrib['batter']: {}})
+						boxes[inning_num][half.tag][atbat.attrib['batter']].update({atbat.attrib['num']: ScoreBox()})
+						box = boxes[inning_num][half.tag][atbat.attrib['batter']][atbat.attrib['num']]
 
 						box.strikes(int(atbat.attrib['s']))
 						box.balls(int(atbat.attrib['b']))
@@ -161,25 +178,36 @@ if __name__ == '__main__':
 							if m:
 								box.home_first('E%d' % pos(m.group(1)))
 
+						if atbat.attrib['b2'] and atbat.attrib['b2'] != atbat.attrib['batter']:
+							runner2 = boxes[inning_num][half.tag][atbat.attrib['b2']]
+							ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+							boxes[inning_num][half.tag][atbat.attrib['b2']][ab].first_second(get_player(id=atbat.attrib['batter']).num)
 
+						if atbat.attrib['b3'] and atbat.attrib['b3'] != atbat.attrib['batter']:
+							runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
+							ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+							boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
 
 	for inn,halves in boxes.items():
-		for half,atbats in halves.items():
-			for ab,box in atbats.items():
+		for half,batters in halves.items():
+			for batter,atbats in batters.items():
+				for num,box in atbats.items():
+					args.update({'inn': str(inn).zfill(2), 'half': half, 'num': num.zfill(3), 'home': home.abbrev, 'away': away.abbrev})
 
-				args.update({'inn': str(inn).zfill(2), 'half': half, 'num': ab.zfill(3), 'home': home.abbrev, 'away': away.abbrev})
+					games_dir = 'games'
+					day_dir = '%(year)s_%(month)s_%(day)s' % args
+					teams_dir = '%(home)s_%(away)s' % args
+					image_name = '%(num)s_%(inn)s_%(half)s.bmp' % args
 
-				games_dir = 'games'
-				day_dir = '%(year)s_%(month)s_%(day)s' % args
-				teams_dir = '%(home)s_%(away)s' % args
-				image_name = '%(num)s_%(inn)s_%(half)s.bmp' % args
+					dir_path = os.path.abspath(os.path.join(games_dir, day_dir, teams_dir))
+					file_path = os.path.join(dir_path, image_name)
 
-				dir_path = os.path.abspath(os.path.join(games_dir, day_dir, teams_dir))
-				file_path = os.path.join(dir_path, image_name)
+					if not os.path.exists(dir_path):
+						os.makedirs(dir_path)
 
-				if not os.path.exists(dir_path):
-					os.makedirs(dir_path)
+					#print 'saving %s' % file_path
 
-				print 'saving %s' % file_path
-
-				box.save(file_name=file_path)
+					box.save(file_name=file_path)
+	import pprint
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(boxes)
