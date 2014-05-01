@@ -38,6 +38,11 @@ class ScoreBox():
         self.draw.text(c, str(scoring), font=font)
 
     def draw_diamond(self):
+        self.draw.line([self._coord(0,0,1), self._coord(0,1,1)], width=2)
+        self.draw.line([self._coord(0,1,1), self._coord(1,1,1)], width=2)
+        self.draw.line([self._coord(1,1,1), self._coord(1,0,1)], width=2)
+        self.draw.line([self._coord(1,0,1), self._coord(0,0,1)], width=2)
+
         self.draw.line([self.coord_10(5,1), self.coord_10(9,5)], width=2, fill=128) # Home - 1st
         self.draw.line([self.coord_10(9,5), self.coord_10(5,9)], width=2, fill=128) #  1st - 2nd
         self.draw.line([self.coord_10(5,9), self.coord_10(1,5)], width=2, fill=128) #  2nd - 3rd
@@ -79,11 +84,11 @@ class ScoreBox():
     def big_out(self, scoring, num):
         font = self.get_font(80)
         width = font.getsize(scoring)[0]/2
-        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.4), scoring, font=font)
+        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.325), scoring, font=font)
         self.out(num)
 
     def out(self, num):
-        font = self.get_font(80)
+        font = self.get_font(50)
         self.draw.text(self.coord_20(1,4), str(num), font=font)
 
     def out_at_2nd(self, scoring, num):
@@ -108,15 +113,15 @@ class ScoreBox():
         if num > 2:
             num = 2
         for i in xrange(num):
-            self.draw.line([self.coord_10(10-i,1), self.coord_10(9-i,2)])
-            self.draw.line([self.coord_10(9-i,1), self.coord_10(10-i,2)])
+            self.draw.line([self.coord_10(10-i,1), self.coord_10(9-i,2)], width=2)
+            self.draw.line([self.coord_10(9-i,1), self.coord_10(10-i,2)], width=2)
 
     def balls(self, num):
         if num > 3:
             num = 3
         for i in xrange(num):
-            self.draw.line([self.coord_10(10-i,0), self.coord_10(9-i,1)])
-            self.draw.line([self.coord_10(9-i,0), self.coord_10(10-i,1)])
+            self.draw.line([self.coord_10(10-i,0), self.coord_10(9-i,1)], width=2)
+            self.draw.line([self.coord_10(9-i,0), self.coord_10(10-i,1)], width=2)
 
     def draw_box(self):
         self.draw_diamond()

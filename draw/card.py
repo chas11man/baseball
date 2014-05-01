@@ -167,18 +167,29 @@ class ScoreCard():
 		self.vert_solid_line(75, start=12, end=14)
 
 		# Boxes
-		# box = Image.open(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_04_29', 'HOU_WSH', '001_01_top.gif'))
-		# self.image.paste(box, self.coord(12,74))
+		i = 0
+		for num,filename in enumerate(os.listdir(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_04_30', 'HOU_WSH'))):
+			if filename[7:10]=='top':
+				col = int(filename[4:6])
+				if col == 1:
+					i += 1
+					row = i%9
+					x = (col + 1) * 6
+					y = 74 - (row * 6)
+					name = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_04_30', 'HOU_WSH', filename))
+					box = Image.open(name)
+					self.image.paste(box, self.coord(x,y))
 
 	def text(self):
+		pass
 		# Fonts
-		font_big = self.get_font('Umpush', 80)
-		font_small = self.get_font('Umpush', 42)
+		# font_big = self.get_font('Umpush', 80)
+		# font_small = self.get_font('Umpush', 42)
 		# script = self.get_font('Purisa-Bold', 14)
-		script_big = self.get_font('Purisa-Bold', 80)
+		# script_big = self.get_font('Purisa-Bold', 80)
 
 		# Text
-		self.draw.text(self.coord(7, 78), 'Nationals', font=script_big)
+		# self.draw.text(self.coord(7, 78), 'Nationals', font=script_big)
 
 		# self.draw.text(self.coord(0,93,100), '2', font=script)
 		# self.draw.text(self.coord(4,93,100), 'Span', font=script)
@@ -198,10 +209,20 @@ class ScoreCard():
 
 
 
-		self.draw.text(self.coord(1,78), 'Team:', font=font_big)
+		# self.draw.text(self.coord(1,78), 'Team:', font=font_big)
 
-		self.draw.text(self.coord(.5,75.5), '#', font=font_small)
-		# self.draw.text(self.coord(3,75.5), 'Name', font=font_small)
+		# self.draw.text(self.coord(.5,75.5), '#', font=font_small)
+		# self.draw.text(self.coord(4.5,75.5), 'Name', font=font_small)
+		# self.draw.text(self.coord(10.5,75.5), 'P', font=font_small)
+		# self.draw.text(self.coord(14.5,75.5), '1', font=font_small)
+		# self.draw.text(self.coord(20.5,75.5), '2', font=font_small)
+		# self.draw.text(self.coord(26.5,75.5), '3', font=font_small)
+		# self.draw.text(self.coord(32.5,75.5), '4', font=font_small)
+		# self.draw.text(self.coord(38.5,75.5), '5', font=font_small)
+		# self.draw.text(self.coord(44.5,75.5), '6', font=font_small)
+		# self.draw.text(self.coord(50.5,75.5), '7', font=font_small)
+		# self.draw.text(self.coord(56.5,75.5), '8', font=font_small)
+		# self.draw.text(self.coord(62.5,75.5), '9', font=font_small)
 
 if __name__ == '__main__':
 	card = ScoreCard('blankCard')
