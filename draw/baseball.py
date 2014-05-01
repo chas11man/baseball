@@ -1,13 +1,13 @@
 from PIL import Image, ImageDraw, ImageFont
-import sys, os
+import os
 
 class ScoreBox():
     def __init__(self):
-        self.image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.bmp'))
+        self.image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.gif'))
         self.draw = ImageDraw.Draw(self.image)
         self.main()
 
-    def save(self, file_name='test.bmp'):
+    def save(self, file_name='test.gif'):
         del self.draw
         self.image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', file_name), )
 

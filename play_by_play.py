@@ -58,7 +58,7 @@ def pos(string):
 	else:
 		return 0
 
-def parse_play(atbat, box):
+def parse_event(atbat, box):
 	e = atbat.attrib['event']
 	if e == 'Strikeout':
 		box.big_out('K', int(atbat.attrib['o']))
@@ -129,9 +129,22 @@ def parse_play(atbat, box):
 		try:
 			runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
 			ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+			boxes[inning_num][half.tag][atbat.attrib['b3']][ab].first_second()
 			boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
 		except KeyError:
 			pass
+
+	clean = re.sub(' +', ' ', atbat.attrib['des'])
+	split = clean.split()
+	re_name = re.compile('([A-Z][A-Za-z\.]+ )+')
+	m = re_name.match(clean)
+
+	if m:
+		print m.group()
+		print re_name.sub('', clean)
+	if 'score' in atbat.attrib:
+		pass
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='options')
@@ -178,10 +191,10 @@ if __name__ == '__main__':
 			a = player.attrib
 			if id == a['id'] or num == a['num'] or first == a['first'] or last == a['last']:
 				if a['parent_team_id'] == home.id:
-					t = home
+					team = home
 				else:
-					t = away
-				return Player(a['id'], a['num'], a['boxname'], a['current_position'], t, a['first'], a['last'])
+					team = away
+				return Player(a['id'], a['num'], a['boxname'], a['current_position'], team, a['first'], a['last'])
 
 	boxes = {}
 
@@ -199,20 +212,8 @@ if __name__ == '__main__':
 
 						box.strikes(int(atbat.attrib['s']))
 						box.balls(int(atbat.attrib['b']))
-						clean = re.sub(' +', ' ', atbat.attrib['des'])
-						split = clean.split()
-						re_name = re.compile('([A-Z][A-Za-z\.]+ )+')
-						m = re_name.match(clean)
 
-						# if 'walks.' in split:
-						# 	print 'walk', split
-						# if m:
-						# 	print m.group()
-						# 	print re_name.sub('', clean)
-
-
-
-						parse_play(atbat, box)
+						parse_event(atbat, box)
 
 	for inn,halves in boxes.items():
 		for half,batters in halves.items():
@@ -223,7 +224,7 @@ if __name__ == '__main__':
 					games_dir = 'games'
 					day_dir = '%(year)s_%(month)s_%(day)s' % args
 					teams_dir = '%(home)s_%(away)s' % args
-					image_name = '%(num)s_%(inn)s_%(half)s.bmp' % args
+					image_name = '%(num)s_%(inn)s_%(half)s.gif' % args
 
 					dir_path = os.path.abspath(os.path.join(games_dir, day_dir, teams_dir))
 					file_path = os.path.join(dir_path, image_name)
