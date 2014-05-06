@@ -22,19 +22,19 @@ class ScoreBox():
         return self._coord(x, y, 20)
 
     def get_font(self, size):
-        return ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', size)
+        return ImageFont.truetype('/usr/share/fonts/truetype/tlwg/Purisa-Bold.ttf', size)
 
     def play(self, scoring, base=1):
         if base == 1:
-            c = self.coord_20(16,7)
+            c = self.coord_20(15,9)
         elif base == 2:
-            c = self.coord_20(12,19)
+            c = self.coord_20(13,20)
         elif base == 3:
-            c = self.coord_20(1,16)
+            c = self.coord_20(1,19)
         else:
-            c = self.coord_20(5,3)
+            c = self.coord_20(1,6)
 
-        font = self.get_font(40)
+        font = self.get_font(50)
         self.draw.text(c, str(scoring), font=font)
 
     def draw_diamond(self):
@@ -82,14 +82,14 @@ class ScoreBox():
         self.draw.polygon((self.coord_10(5,1), self.coord_10(9,5), self.coord_10(5,9), self.coord_10(1,5)), fill=100)
 
     def big_out(self, scoring, num):
-        font = self.get_font(80)
+        font = self.get_font(70)
         width = font.getsize(scoring)[0]/2
-        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.325), scoring, font=font)
+        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.3), scoring, font=font)
         self.out(num)
 
     def out(self, num):
         font = self.get_font(50)
-        self.draw.text(self.coord_20(1,4), str(num), font=font)
+        self.draw.text(self.coord_20(1,5), str(num), font=font)
 
     def out_at_2nd(self, scoring, num):
         self.draw.line([self.coord_10(9,5), self.coord_20(13,15)], width=8)
