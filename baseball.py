@@ -5,8 +5,8 @@ import MySQLdb
 import urllib2
 import xlrd
 import xml.etree.ElementTree as ET
-from xlrd import open_workbook
 from xlutils.copy import copy
+
 
 def _getOutCell(outSheet, colIndex, rowIndex):
     row = outSheet._Worksheet__rows.get(rowIndex)
@@ -14,6 +14,7 @@ def _getOutCell(outSheet, colIndex, rowIndex):
         return None
     cell = row._Row__cells.get(colIndex)
     return cell
+
 
 def setOutCell(outSheet, col, row, value):
     previousCell = _getOutCell(outSheet, col, row)
@@ -23,20 +24,24 @@ def setOutCell(outSheet, col, row, value):
         if newCell:
             newCell.xf_idx = previousCell.xf_idx
 
+
 def db_querry(querry):
     database = MySQLdb.connect(host="localhost",
-                         user="root",
-                         passwd="chasman",
-                         db="gameday")
+                               user="root",
+                               passwd="chasman",
+                               db="gameday")
     cursor = database.cursor()
     cursor.execute(querry)
     return cursor.fetchall()
 
+
 def get_lineup():
-    response = urllib2.urlopen('http://gd2.mlb.com/components/game/mlb/year_2014/month_04/day_14/gid_2014_04_14_wasmlb_miamlb_1/players.xml')
+    response = urllib2.urlopen(
+        'http://gd2.mlb.com/components/game/mlb/year_2014/month_04/day_14/gid_2014_04_14_wasmlb_miamlb_1/players.xml')
     xml = response.read()
     root = ET.fromstring(xml)
     return root
+
 
 def get_plays():
     return db_querry("""
@@ -48,6 +53,7 @@ def get_plays():
                 ) as game
                 on atbat.game_id=game.game_id;
             """)
+
 
 def init_data():
     in_book = xlrd.open_workbook('test_score_sheet.xls', formatting_info=True)
@@ -95,6 +101,7 @@ def init_data():
 
     sheets[1].insert_bitmap('draw/test.bmp', 4, 3)
     workbook.save('simple.xls')
+
 
 def count_at_bats(player_id):
     return db_querry("""select count(batter)

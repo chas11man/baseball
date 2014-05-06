@@ -1,8 +1,7 @@
 from datetime import date, timedelta
 from draw.baseball import ScoreBox
-from sets import Set
 import xml.etree.ElementTree as ET
-import sys, os
+import os
 import argparse
 import urllib2
 import bs4
