@@ -187,7 +187,7 @@ class ScoreCard():
         script_small = self.get_font('Purisa-Bold', 40)
 
         # Text
-        self.draw.text(self.coord(7,78), 'Nationals', font=script_big)
+        self.draw.text(self.coord(7,77.5), 'Nationals', font=script_big)
 
         self.draw.text(self.coord(0,74), '2', font=script)
         self.draw.text(self.coord(2.5,74), 'Span', font=script)
