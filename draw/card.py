@@ -184,11 +184,12 @@ class ScoreCard():
         font_small = self.get_font('Umpush', 42)
         script = self.get_font('Purisa-Bold', 50)
         script_big = self.get_font('Purisa-Bold', 80)
+        script_small = self.get_font('Purisa-Bold', 40)
 
         # Text
         self.draw.text(self.coord(7,78), 'Nationals', font=script_big)
 
-        self.draw.text(self.coord(0,74), '23', font=script)
+        self.draw.text(self.coord(0,74), '2', font=script)
         self.draw.text(self.coord(2.5,74), 'Span', font=script)
         self.draw.text(self.coord(10.5,74), '8', font=script)
 
@@ -212,20 +213,20 @@ class ScoreCard():
         self.draw.text(self.coord(2.5,44), 'Espinosa', font=script)
         self.draw.text(self.coord(10.5,44), '4', font=script)
 
-        self.draw.text(self.coord(0,38), '59', font=script)
-        self.draw.text(self.coord(2.5,38), 'Lobaton', font=script)
-        self.draw.text(self.coord(10.5,38), '2', font=script)
+        self.draw.text(self.coord(0,38), '15', font=script)
+        self.draw.text(self.coord(2.5,38), 'McLouth', font=script)
+        self.draw.text(self.coord(10.5,38), '7', font=script)
 
-        self.draw.text(self.coord(0,32), '19', font=script)
-        self.draw.text(self.coord(2.5,32), 'Frandsen', font=script)
-        self.draw.text(self.coord(10.5,32), '7', font=script)
+        self.draw.text(self.coord(0,32), '41', font=script)
+        self.draw.text(self.coord(2.5,32), 'Leon', font=script)
+        self.draw.text(self.coord(10.5,32), '2', font=script)
 
-        self.draw.text(self.coord(0,26), '37', font=script)
-        self.draw.text(self.coord(2.5,26), 'Strasburg', font=script)
+        self.draw.text(self.coord(0,26), '27', font=script)
+        self.draw.text(self.coord(2.5,26), 'Zimmermann', font=script_small)
         self.draw.text(self.coord(10.5,26), '1', font=script)
 
-        self.draw.text(self.coord(0,10), '37', font=script)
-        self.draw.text(self.coord(2.5,10), 'Strasburg', font=script)
+        self.draw.text(self.coord(0,10), '27', font=script)
+        self.draw.text(self.coord(2.5,10), 'Zimmermann', font=script_small)
 
         self.draw.text(self.coord(1,78), 'Team:', font=font_big)
 
@@ -269,6 +270,31 @@ class ScoreCard():
         self.draw.text(self.coord(26.2,11.5), 'WP', font=font_small)
         self.draw.text(self.coord(28.3,11.5), 'HP', font=font_small)
         self.draw.text(self.coord(30,11.5), 'BLK', font=font_small)
+
+        self.draw.text(self.coord(13,14.3), '2', font=script_small)
+        self.draw.text(self.coord(16,14.3), '3', font=script_small)
+        self.draw.text(self.coord(13,13.3), '0', font=script_small)
+        self.draw.text(self.coord(16,13.3), '1', font=script_small)
+
+        self.draw.text(self.coord(78.5,74), '4', font=script)
+        self.draw.text(self.coord(80.5,74), '1', font=script)
+        self.draw.text(self.coord(82.5,74), '3', font=script)
+        self.draw.text(self.coord(84.5,74), '0', font=script)
+        self.draw.text(self.coord(86.5,74), '0', font=script)
+        self.draw.text(self.coord(88.5,74), '0', font=script)
+
+        self.draw.text(self.coord(10.5,10), 'N', font=script)
+        self.draw.text(self.coord(12.5,10), '4', font=script)
+        self.draw.text(self.coord(14.2,10), '27', font=script)
+        self.draw.text(self.coord(16.2,10), '12', font=script)
+        self.draw.text(self.coord(18.5,10), '3', font=script)
+        self.draw.text(self.coord(20.5,10), '4', font=script)
+        self.draw.text(self.coord(22.5,10), '0', font=script)
+        self.draw.text(self.coord(24.5,10), '0', font=script)
+        self.draw.text(self.coord(26.5,10), '0', font=script)
+        self.draw.text(self.coord(28.5,10), '0', font=script)
+        self.draw.text(self.coord(30.5,10), '0', font=script)
+
 
 if __name__ == '__main__':
     card = ScoreCard('blankCard')
