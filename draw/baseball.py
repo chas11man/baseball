@@ -32,7 +32,7 @@ class ScoreBox():
         elif base == 3:
             c = self.coord_20(1,19)
         else:
-            c = self.coord_20(1,6)
+            c = self.coord_20(0,8)
 
         font = self.get_font(50)
         self.draw.text(c, str(scoring), font=font)

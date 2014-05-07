@@ -167,13 +167,13 @@ class ScoreCard():
 
         # Boxes
         i = 0
-        for filename in sorted(os.listdir(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_05', 'WSH_LAD'))):
-            if filename[7:10]=='bot':
+        for filename in sorted(os.listdir(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_06', 'WSH_LAD'))):
+            if filename[7:10]=='top':
                 col = int(filename[4:6])
                 row = i%9
                 x = (col + 1) * 6
                 y = 74 - (row * 6)
-                name = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_05', 'WSH_LAD', filename))
+                name = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_06', 'WSH_LAD', filename))
                 box = Image.open(name)
                 self.image.paste(box, self.coord(x,y))
                 i += 1
@@ -190,39 +190,39 @@ class ScoreCard():
         self.draw.text(self.coord(7,77.5), 'Nationals', font=script_big)
 
         self.draw.text(self.coord(0,74), '2', font=script)
-        self.draw.text(self.coord(2.5,74), 'Span', font=script)
+        self.draw.text(self.coord(2.5,74), 'Gordon', font=script)
         self.draw.text(self.coord(10.5,74), '8', font=script)
 
         self.draw.text(self.coord(0,68), '6', font=script)
-        self.draw.text(self.coord(2.5,68), 'Rendon', font=script)
+        self.draw.text(self.coord(2.5,68), 'Crawford', font=script)
         self.draw.text(self.coord(10.5,68), '5', font=script)
 
         self.draw.text(self.coord(0,62), '28', font=script)
-        self.draw.text(self.coord(2.5,62), 'Werth', font=script)
+        self.draw.text(self.coord(2.5,62), 'Ramirez', font=script)
         self.draw.text(self.coord(10.5,62), '9', font=script)
 
         self.draw.text(self.coord(0,56), '25', font=script)
-        self.draw.text(self.coord(2.5,56), 'Laroche', font=script)
+        self.draw.text(self.coord(2.5,56), 'Kemp', font=script)
         self.draw.text(self.coord(10.5,56), '3', font=script)
 
         self.draw.text(self.coord(0,50), '20', font=script)
-        self.draw.text(self.coord(2.5,50), 'Desmond', font=script)
+        self.draw.text(self.coord(2.5,50), 'Ethier', font=script)
         self.draw.text(self.coord(10.5,50), '6', font=script)
 
         self.draw.text(self.coord(0,44), '8', font=script)
-        self.draw.text(self.coord(2.5,44), 'Espinosa', font=script)
+        self.draw.text(self.coord(2.5,44), 'Uribe', font=script)
         self.draw.text(self.coord(10.5,44), '4', font=script)
 
         self.draw.text(self.coord(0,38), '15', font=script)
-        self.draw.text(self.coord(2.5,38), 'McLouth', font=script)
+        self.draw.text(self.coord(2.5,38), 'Van Slyke', font=script)
         self.draw.text(self.coord(10.5,38), '7', font=script)
 
         self.draw.text(self.coord(0,32), '41', font=script)
-        self.draw.text(self.coord(2.5,32), 'Leon', font=script)
+        self.draw.text(self.coord(2.5,32), 'Butera', font=script)
         self.draw.text(self.coord(10.5,32), '2', font=script)
 
         self.draw.text(self.coord(0,26), '27', font=script)
-        self.draw.text(self.coord(2.5,26), 'Zimmermann', font=script_small)
+        self.draw.text(self.coord(2.5,26), 'Kershaw', font=script_small)
         self.draw.text(self.coord(10.5,26), '1', font=script)
 
         self.draw.text(self.coord(0,10), '27', font=script)

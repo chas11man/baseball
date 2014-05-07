@@ -58,28 +58,78 @@ def pos(string):
         return 0
 
 def parse_event(atbat, box):
+    clean = re.sub(' +', ' ', atbat.attrib['des'])
+    split = clean.split()
+    events = {}
+    start = 0
+
+    for num,i in enumerate(split):
+        if '.' in i:
+            end = num+1
+            event = split[start:end]
+
+            r = re.compile('[A-Z]')
+            m = r.match(event[2])
+
+            if event[0] == 'With':
+                last = event[2]
+            elif m:
+                last = event[1] + ' ' + event[2]
+            else:
+                last = event[1]
+
+            player_id = get_player(last=last).id
+            player = boxes[inning_num][half.tag][player_id]
+            ab = min(player.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+            box = boxes[inning_num][half.tag][player_id][ab]
+            events.update({box:event})
+            start = end
+
+    batter_num = get_player(id=atbat.attrib['batter']).num
+    for box, play in events.iteritems():
+        print play
+        if 'scores.' in play:
+            box.first_second()
+            box.second_third()
+            box.third_home(batter_num)
+            box.score()
+        elif '1st.' in play:
+            box.home_first('FC')
+        elif '2nd.' in play:
+            if 'to' in play:
+                box.first_second(batter_num)
+            elif 'out' in play and 'at' in play:
+                box.out_at_2nd('x-x', 'x')
+        elif '3rd.' in play:
+            if 'to' in play:
+                box.first_second()
+                box.second_third(batter_num)
+            elif 'out' in play and 'at' in play:
+                box.out_at_3rd('x-x', 'x')
+        elif 'singles' in play:
+            box.home_first('1B')
+        elif 'doubles' in play:
+            box.home_first()
+            box.first_second('2B')
+        elif 'triples' in play:
+            box.home_first()
+            box.first_second()
+            box.second_third('3B')
+        elif 'homers' in play:
+            box.home_first()
+            box.first_second()
+            box.second_third()
+            box.third_home('HR')
+            box.score()
+        elif 'walks.' in play:
+            box.home_first('BB')
+
+
     e = atbat.attrib['event']
     if e == 'Strikeout':
         box.big_out('K', int(atbat.attrib['o']))
-    elif e == 'Walk':
-        box.home_first('BB')
     elif e == 'Hit By Pitch':
-        box.home_first('HBP')
-    elif e == 'Single':
-        box.home_first('1B')
-    elif e == 'Double':
-        box.home_first()
-        box.first_second('2B')
-    elif e == 'Triple':
-        box.home_first()
-        box.first_second()
-        box.second_third('3B')
-    elif e == 'Home Run':
-        box.home_first()
-        box.first_second()
-        box.second_third()
-        box.third_home('HR')
-        box.score()
+        box.home_first('HP')
     elif e == 'Groundout' or e == 'Bunt Groundout':
         r = re.compile('([A-Za-z\s\.]+)( bunt)? grounds out(,| sharply,| softly,) ([a-z\s]+) ([A-Za-z\s\.]+) to ([a-z\s]+) ([A-Za-z\s\.]+)\. ')
         m = r.match(atbat.attrib['des'])
@@ -116,33 +166,22 @@ def parse_event(atbat, box):
         if m:
             box.home_first('E%d' % pos(m.group(1)))
 
-    if atbat.attrib['b2'] and atbat.attrib['b2'] != atbat.attrib['batter']:
-        try:
-            runner2 = boxes[inning_num][half.tag][atbat.attrib['b2']]
-            ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
-            boxes[inning_num][half.tag][atbat.attrib['b2']][ab].first_second(get_player(id=atbat.attrib['batter']).num)
-        except KeyError:
-            pass
+    # if atbat.attrib['b2'] and atbat.attrib['b2'] != atbat.attrib['batter']:
+    #     try:
+    #         runner2 = boxes[inning_num][half.tag][atbat.attrib['b2']]
+    #         ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+    #         boxes[inning_num][half.tag][atbat.attrib['b2']][ab].first_second(get_player(id=atbat.attrib['batter']).num)
+    #     except KeyError:
+    #         pass
 
-    if atbat.attrib['b3'] and atbat.attrib['b3'] != atbat.attrib['batter']:
-        try:
-            runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
-            ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
-            boxes[inning_num][half.tag][atbat.attrib['b3']][ab].first_second()
-            boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
-        except KeyError:
-            pass
-
-    clean = re.sub(' +', ' ', atbat.attrib['des'])
-    split = clean.split()
-    re_name = re.compile('([A-Z][A-Za-z\.]+ )+')
-    m = re_name.match(clean)
-
-    if m:
-        print m.group()
-        print re_name.sub('', clean)
-    if 'score' in atbat.attrib:
-        pass
+    # if atbat.attrib['b3'] and atbat.attrib['b3'] != atbat.attrib['batter']:
+    #     try:
+    #         runner2 = boxes[inning_num][half.tag][atbat.attrib['b3']]
+    #         ab = min(runner2.keys(), key=lambda x:abs(int(x)-int(atbat.attrib['num'])))
+    #         boxes[inning_num][half.tag][atbat.attrib['b3']][ab].first_second()
+    #         boxes[inning_num][half.tag][atbat.attrib['b3']][ab].second_third(get_player(id=atbat.attrib['batter']).num)
+    #     except KeyError:
+    #         pass
 
 
 if __name__ == '__main__':
