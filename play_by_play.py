@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from draw.baseball import ScoreBox
+from draw.plays import ScoreBox
 import xml.etree.ElementTree as ET
 import os
 import argparse
