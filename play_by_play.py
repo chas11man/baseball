@@ -185,27 +185,31 @@ def parse_event(atbat, box):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='options')
-    yes = date.today()-timedelta(days=1)
-    def_team = 'was'
-    parser.add_argument('-y', '--year', default=yes.strftime('%Y'), help='Year of game', metavar='Year')
-    parser.add_argument('-m', '--month', default=yes.strftime('%m'), help='Month of game', metavar='Month')
-    parser.add_argument('-d', '--day', default=yes.strftime('%d'), help='Day of game', metavar='Day')
-    parser.add_argument('-t', '--team', default=def_team, help='One of the teams', metavar='Team')
+    base_url = 'http://gd2.mlb.com/components/game/mlb/'
 
-    args = vars(parser.parse_args())
-    day_url = 'http://gd2.mlb.com/components/game/mlb/year_%(year)s/month_%(month)s/day_%(day)s/' % args
-    day_data = urllib2.urlopen(day_url)
-    soup = bs4.BeautifulSoup(day_data)
-    game_url = day_url + soup.find_all(text=re.compile(args['team']))[0]
-    game_url = game_url.replace(' ', '')
+    # year = raw_input("What year?")
+    # month = raw_input("What month?")
+    # day = raw_input("What day?")
+    # day_url = 'http://gd2.mlb.com/components/game/mlb/year_%s/month_%s/day_%s/' % (year, month, day)
+    args = {'year': '2014', 'month': '08', 'day': '24'}
+    day_url = base_url + 'year_2014/month_08/day_24/'
+    soup = bs4.BeautifulSoup(urllib2.urlopen(day_url))
+
+    game_url = day_url + soup.find(href=re.compile('wasmlb')).get('href')
 
     game_response = urllib2.urlopen(game_url + 'game.xml')
     game_xml = game_response.read()
     game_root = ET.fromstring(game_xml)
 
-    location = game_root.findall('stadium')[0].attrib['location']
+    game_events_response = urllib2.urlopen(game_url + 'game_events.xml')
+    game_events_xml = game_events_response.read()
+    game_events_root = ET.fromstring(game_events_xml)
 
+    players_response = urllib2.urlopen(game_url + 'players.xml')
+    players_xml = players_response.read()
+    players_root = ET.fromstring(players_xml)
+
+    location = game_root.findall('stadium')[0].attrib['location']
     for team in game_root.iter('team'):
         a = team.attrib
         t = Team(a['code'], a['abbrev'], a['id'], a['name'], a['name_full'], a['name_brief'])
@@ -214,15 +218,6 @@ if __name__ == '__main__':
         elif a['type'] == 'away':
             away = t
     g = Game(home, away, location)
-
-    game_events_response = urllib2.urlopen(game_url + 'game_events.xml')
-    print game_url + 'game_events.xml'
-    game_events_xml = game_events_response.read()
-    game_events_root = ET.fromstring(game_events_xml)
-
-    players_response = urllib2.urlopen(game_url + 'players.xml')
-    players_xml = players_response.read()
-    players_root = ET.fromstring(players_xml)
 
     def get_player(id=None, num=None, first=None, last=None):
         for player in players_root.iter('player'):
@@ -269,7 +264,5 @@ if __name__ == '__main__':
 
                     if not os.path.exists(dir_path):
                         os.makedirs(dir_path)
-
-                    # print 'saving %s' % file_path
 
                     box.save(file_name=file_path)

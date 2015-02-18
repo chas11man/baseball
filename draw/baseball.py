@@ -3,13 +3,13 @@ import os
 
 class ScoreBox():
     def __init__(self):
-        self.image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blank.gif'))
+        self.image = Image.open(os.path.abspath('blanks/blank.gif'))
         self.draw = ImageDraw.Draw(self.image)
         self.main()
 
-    def save(self, file_name='test.gif'):
+    def save(self, file_name='output/test.gif'):
         del self.draw
-        self.image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', file_name), )
+        self.image.save(os.path.abspath(file_name))
 
     def _coord(self, x, y, frac):
         div = self.image.size[0]/frac
@@ -21,20 +21,23 @@ class ScoreBox():
     def coord_20(self, x, y):
         return self._coord(x, y, 20)
 
+    def coord_40(self, x, y):
+        return self._coord(x, y, 40)
+
     def get_font(self, size):
-        return ImageFont.truetype('/usr/share/fonts/truetype/tlwg/Purisa-Bold.ttf', size)
+        return ImageFont.truetype(os.path.abspath('fonts/JustAnotherHand.ttf'), size)
 
     def play(self, scoring, base=1):
         if base == 1:
-            c = self.coord_20(15,9)
+            c = self.coord_20(16,7)
         elif base == 2:
-            c = self.coord_20(13,20)
+            c = self.coord_20(13,19)
         elif base == 3:
             c = self.coord_20(1,19)
         else:
-            c = self.coord_20(0,8)
+            c = self.coord_20(0,7)
 
-        font = self.get_font(50)
+        font = self.get_font(40)
         self.draw.text(c, str(scoring), font=font)
 
     def draw_diamond(self):
@@ -84,12 +87,12 @@ class ScoreBox():
     def big_out(self, scoring, num):
         font = self.get_font(70)
         width = font.getsize(scoring)[0]/2
-        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.3), scoring, font=font)
+        self.draw.text((self.image.size[0]/2-width,self.image.size[1]*.4), scoring, font=font)
         self.out(num)
 
     def out(self, num):
         font = self.get_font(50)
-        self.draw.text(self.coord_20(1,5), str(num), font=font)
+        self.draw.text(self.coord_40(3,7), str(num), font=font)
 
     def out_at_2nd(self, scoring, num):
         self.draw.line([self.coord_10(9,5), self.coord_20(13,15)], width=8)
@@ -123,17 +126,10 @@ class ScoreBox():
             self.draw.line([self.coord_10(10-i,0), self.coord_10(9-i,1)], width=2)
             self.draw.line([self.coord_10(9-i,0), self.coord_10(10-i,1)], width=2)
 
-    def draw_box(self):
+    def main(self):
         self.draw_diamond()
         self.draw_count()
 
-    def main(self):
-        self.draw_box()
-
 if __name__ == '__main__':
     box = ScoreBox()
-    box.balls(3)
-    box.strikes(2)
-    box.home_first('1B')
-    box.out_at_2nd('6-4', 1)
     box.save()

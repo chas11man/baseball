@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 def get_font(name, size):
-    return ImageFont.truetype('/usr/share/fonts/truetype/tlwg/%s.ttf' % name, size)
+    return ImageFont.truetype(os.path.abspath('fonts/' + name + '.ttf'), size)
 
 def coord(image, x, y):
     h = image.size[1]
@@ -10,13 +10,13 @@ def coord(image, x, y):
 
 if __name__ == '__main__':
     file_name = 'blankCard'
-    image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '%s.gif' % file_name))
+    image = Image.open(os.path.abspath('blanks/blankCard.gif'))
     draw = ImageDraw.Draw(image)
 
-    font_big = get_font('Umpush', 80)
-    font_small = get_font('Umpush', 42)
-    script = get_font('Purisa-Bold', 14)
-    script_big = get_font('Purisa-Bold', 80)
+    font_big = get_font('Slabo', 80)
+    font_small = get_font('Slabo', 42)
+    script = get_font('JustAnotherHand', 14)
+    script_big = get_font('JustAnotherHand', 80)
 
     draw.text(coord(image, 0, 78), 'TITLE', font=font_big)
     draw.text(coord(image, 7, 78), 'Big text header', font=script_big)
@@ -26,4 +26,4 @@ if __name__ == '__main__':
 
     del draw
     file_name = 'test'
-    image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '%s.gif' % file_name))
+    image.save(os.path.abspath('output/' + file_name + '.gif'))

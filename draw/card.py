@@ -3,16 +3,16 @@ import os
 
 class ScoreCard():
     def __init__(self, file_name):
-        self.image = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '%s.gif' % file_name))
+        self.image = Image.open(os.path.abspath('blanks/' + file_name + '.gif'))
         self.draw = ImageDraw.Draw(self.image)
 
     def save(self, file_name='test'):
         del self.draw
         self.image = self.image.convert('P')
-        self.image.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '%s.gif' % file_name), 'gif')
+        self.image.save(os.path.abspath('output/' + file_name + '.gif'))
 
     def get_font(self, name, size):
-        return ImageFont.truetype('/usr/share/fonts/truetype/tlwg/%s.ttf' % name, size)
+        return ImageFont.truetype(os.path.abspath('fonts/' + name + '.ttf'), size)
 
     def coord(self, x, y):
         h = self.image.size[1]
@@ -167,133 +167,136 @@ class ScoreCard():
 
         # Boxes
         i = 0
-        for filename in sorted(os.listdir(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_06', 'WSH_LAD'))):
+        for filename in sorted(os.listdir(os.path.abspath('games/2014_08_24/WSH_SF'))):
             if filename[7:10]=='top':
                 col = int(filename[4:6])
                 row = i%9
                 x = (col + 1) * 6
                 y = 74 - (row * 6)
-                name = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'games', '2014_05_06', 'WSH_LAD', filename))
+                name = os.path.abspath('games/2014_08_24/WSH_SF/' + filename)
                 box = Image.open(name)
                 self.image.paste(box, self.coord(x,y))
                 i += 1
 
     def text(self):
         # Fonts
-        font_big = self.get_font('Umpush', 80)
-        font_small = self.get_font('Umpush', 42)
-        script = self.get_font('Purisa-Bold', 50)
-        script_big = self.get_font('Purisa-Bold', 80)
-        script_small = self.get_font('Purisa-Bold', 40)
+        font_big = self.get_font('Slabo', 80)
+        font_small = self.get_font('Slabo', 42)
+        script = self.get_font('JustAnotherHand', 70)
+        script_big = self.get_font('JustAnotherHand', 80)
+        script_small = self.get_font('JustAnotherHand', 40)
 
         # Text
         self.draw.text(self.coord(7,77.5), 'Nationals', font=script_big)
 
-        self.draw.text(self.coord(0,74), '2', font=script)
-        self.draw.text(self.coord(2.5,74), 'Gordon', font=script)
-        self.draw.text(self.coord(10.5,74), '8', font=script)
+        self.draw.text(self.coord(0,73.4), '2', font=script)
+        self.draw.text(self.coord(2.5,73.4), 'Gordon', font=script)
+        self.draw.text(self.coord(10.5,73.4), '8', font=script)
 
-        self.draw.text(self.coord(0,68), '6', font=script)
-        self.draw.text(self.coord(2.5,68), 'Crawford', font=script)
-        self.draw.text(self.coord(10.5,68), '5', font=script)
+        self.draw.text(self.coord(0,67.4), '6', font=script)
+        self.draw.text(self.coord(2.5,67.4), 'Crawford', font=script)
+        self.draw.text(self.coord(10.5,67.4), '5', font=script)
 
-        self.draw.text(self.coord(0,62), '28', font=script)
-        self.draw.text(self.coord(2.5,62), 'Ramirez', font=script)
-        self.draw.text(self.coord(10.5,62), '9', font=script)
+        self.draw.text(self.coord(0,61.4), '28', font=script)
+        self.draw.text(self.coord(2.5,61.4), 'Ramirez', font=script)
+        self.draw.text(self.coord(10.5,61.4), '9', font=script)
 
-        self.draw.text(self.coord(0,56), '25', font=script)
-        self.draw.text(self.coord(2.5,56), 'Kemp', font=script)
-        self.draw.text(self.coord(10.5,56), '3', font=script)
+        self.draw.text(self.coord(0,55.4), '25', font=script)
+        self.draw.text(self.coord(2.5,55.4), 'Kemp', font=script)
+        self.draw.text(self.coord(10.5,55.4), '3', font=script)
 
-        self.draw.text(self.coord(0,50), '20', font=script)
-        self.draw.text(self.coord(2.5,50), 'Ethier', font=script)
-        self.draw.text(self.coord(10.5,50), '6', font=script)
+        self.draw.text(self.coord(0,49.4), '20', font=script)
+        self.draw.text(self.coord(2.5,49.4), 'Ethier', font=script)
+        self.draw.text(self.coord(10.5,49.4), '6', font=script)
 
-        self.draw.text(self.coord(0,44), '8', font=script)
-        self.draw.text(self.coord(2.5,44), 'Uribe', font=script)
-        self.draw.text(self.coord(10.5,44), '4', font=script)
+        self.draw.text(self.coord(0,43.4), '8', font=script)
+        self.draw.text(self.coord(2.5,43.4), 'Uribe', font=script)
+        self.draw.text(self.coord(10.5,43.4), '4', font=script)
 
-        self.draw.text(self.coord(0,38), '15', font=script)
-        self.draw.text(self.coord(2.5,38), 'Van Slyke', font=script)
-        self.draw.text(self.coord(10.5,38), '7', font=script)
+        self.draw.text(self.coord(0,37.4), '15', font=script)
+        self.draw.text(self.coord(2.5,37.4), 'Van Slyke', font=script)
+        self.draw.text(self.coord(10.5,37.4), '7', font=script)
 
-        self.draw.text(self.coord(0,32), '41', font=script)
-        self.draw.text(self.coord(2.5,32), 'Butera', font=script)
-        self.draw.text(self.coord(10.5,32), '2', font=script)
+        self.draw.text(self.coord(0,31.4), '41', font=script)
+        self.draw.text(self.coord(2.5,31.4), 'Butera', font=script)
+        self.draw.text(self.coord(10.5,31.4), '2', font=script)
 
-        self.draw.text(self.coord(0,26), '27', font=script)
-        self.draw.text(self.coord(2.5,26), 'Kershaw', font=script_small)
-        self.draw.text(self.coord(10.5,26), '1', font=script)
+        self.draw.text(self.coord(0,25.4), '27', font=script)
+        self.draw.text(self.coord(2.5,25.4), 'Kershaw', font=script)
+        self.draw.text(self.coord(10.5,25.4), '1', font=script)
 
-        self.draw.text(self.coord(0,10), '27', font=script)
-        self.draw.text(self.coord(2.5,10), 'Zimmermann', font=script_small)
+        self.draw.text(self.coord(0,9.4), '27', font=script)
+        self.draw.text(self.coord(2.5,9.4), 'Zimmermann', font=script)
 
         self.draw.text(self.coord(1,78), 'Team:', font=font_big)
 
-        self.draw.text(self.coord(.5,75.5), '#', font=font_small)
-        self.draw.text(self.coord(4.5,75.5), 'Name', font=font_small)
-        self.draw.text(self.coord(10.5,75.5), 'P', font=font_small)
-        self.draw.text(self.coord(14.5,75.5), '1', font=font_small)
-        self.draw.text(self.coord(20.5,75.5), '2', font=font_small)
-        self.draw.text(self.coord(26.5,75.5), '3', font=font_small)
-        self.draw.text(self.coord(32.5,75.5), '4', font=font_small)
-        self.draw.text(self.coord(38.5,75.5), '5', font=font_small)
-        self.draw.text(self.coord(44.5,75.5), '6', font=font_small)
-        self.draw.text(self.coord(50.5,75.5), '7', font=font_small)
-        self.draw.text(self.coord(56.5,75.5), '8', font=font_small)
-        self.draw.text(self.coord(62.5,75.5), '9', font=font_small)
-        self.draw.text(self.coord(68.5,75.5), '10', font=font_small)
-        self.draw.text(self.coord(74.5,75.5), '11', font=font_small)
+        self.draw.text(self.coord(.5,75.1), '#', font=font_small)
+        self.draw.text(self.coord(4.5,75.1), 'Name', font=font_small)
+        self.draw.text(self.coord(10.5,75.1), 'P', font=font_small)
+        self.draw.text(self.coord(14.5,75.1), '1', font=font_small)
+        self.draw.text(self.coord(20.5,75.1), '2', font=font_small)
+        self.draw.text(self.coord(26.5,75.1), '3', font=font_small)
+        self.draw.text(self.coord(32.5,75.1), '4', font=font_small)
+        self.draw.text(self.coord(38.5,75.1), '5', font=font_small)
+        self.draw.text(self.coord(44.5,75.1), '6', font=font_small)
+        self.draw.text(self.coord(50.5,75.1), '7', font=font_small)
+        self.draw.text(self.coord(56.5,75.1), '8', font=font_small)
+        self.draw.text(self.coord(62.5,75.1), '9', font=font_small)
+        self.draw.text(self.coord(68.5,75.1), '10', font=font_small)
+        self.draw.text(self.coord(74.5,75.1), '11', font=font_small)
 
-        self.draw.text(self.coord(78.25,75.5), 'AB', font=font_small)
-        self.draw.text(self.coord(80.6,75.5), 'R', font=font_small)
-        self.draw.text(self.coord(82.6,75.5), 'H', font=font_small)
-        self.draw.text(self.coord(84.1,75.5), 'RBI', font=font_small)
-        self.draw.text(self.coord(86.25,75.5), 'BB', font=font_small)
-        self.draw.text(self.coord(88.25,75.5), 'SO', font=font_small)
+        self.draw.text(self.coord(78.25,75.1), 'AB', font=font_small)
+        self.draw.text(self.coord(80.6,75.1), 'R', font=font_small)
+        self.draw.text(self.coord(82.6,75.1), 'H', font=font_small)
+        self.draw.text(self.coord(84.1,75.1), 'RBI', font=font_small)
+        self.draw.text(self.coord(86.25,75.1), 'BB', font=font_small)
+        self.draw.text(self.coord(88.25,75.1), 'SO', font=font_small)
 
-        self.draw.text(self.coord(6.05,14.5), 'RUNS', font=font_small)
-        self.draw.text(self.coord(9.3,14.5), 'HITS', font=font_small)
-        self.draw.text(self.coord(6.1,13.5), 'ERRS', font=font_small)
-        self.draw.text(self.coord(9.4,13.5), 'LOB', font=font_small)
+        self.draw.text(self.coord(6.05,14.1), 'RUNS', font=font_small)
+        self.draw.text(self.coord(9.3,14.1), 'HITS', font=font_small)
+        self.draw.text(self.coord(6.1,13.1), 'ERRS', font=font_small)
+        self.draw.text(self.coord(9.4,13.1), 'LOB', font=font_small)
 
-        self.draw.text(self.coord(.5,11.5), '#', font=font_small)
-        self.draw.text(self.coord(4,11.5), 'Pitchers', font=font_small)
-        self.draw.text(self.coord(10.05,11.5), 'W-L', font=font_small)
-        self.draw.text(self.coord(12.6,11.5), 'IP', font=font_small)
-        self.draw.text(self.coord(14.3,11.5), 'AB', font=font_small)
-        self.draw.text(self.coord(16.6,11.5), 'K', font=font_small)
-        self.draw.text(self.coord(18.3,11.5), 'BB', font=font_small)
-        self.draw.text(self.coord(20.6,11.5), 'H', font=font_small)
-        self.draw.text(self.coord(22.6,11.5), 'R', font=font_small)
-        self.draw.text(self.coord(24.3,11.5), 'ER', font=font_small)
-        self.draw.text(self.coord(26.2,11.5), 'WP', font=font_small)
-        self.draw.text(self.coord(28.3,11.5), 'HP', font=font_small)
-        self.draw.text(self.coord(30,11.5), 'BLK', font=font_small)
+        self.draw.text(self.coord(.5,11.1), '#', font=font_small)
+        self.draw.text(self.coord(4,11.1), 'Pitchers', font=font_small)
+        self.draw.text(self.coord(10.05,11.1), 'W-L', font=font_small)
+        self.draw.text(self.coord(12.6,11.1), 'IP', font=font_small)
+        self.draw.text(self.coord(14.3,11.1), 'AB', font=font_small)
+        self.draw.text(self.coord(16.6,11.1), 'K', font=font_small)
+        self.draw.text(self.coord(18.3,11.1), 'BB', font=font_small)
+        self.draw.text(self.coord(20.6,11.1), 'H', font=font_small)
+        self.draw.text(self.coord(22.6,11.1), 'R', font=font_small)
+        self.draw.text(self.coord(24.3,11.1), 'ER', font=font_small)
+        self.draw.text(self.coord(26.2,11.1), 'WP', font=font_small)
+        self.draw.text(self.coord(28.3,11.1), 'HP', font=font_small)
+        self.draw.text(self.coord(30,11.1), 'BLK', font=font_small)
 
-        self.draw.text(self.coord(13,14.3), '2', font=script_small)
-        self.draw.text(self.coord(16,14.3), '3', font=script_small)
-        self.draw.text(self.coord(13,13.3), '0', font=script_small)
-        self.draw.text(self.coord(16,13.3), '1', font=script_small)
+        # Inning
+        self.draw.text(self.coord(13,13.8), '2', font=script_small)
+        self.draw.text(self.coord(16,13.8), '3', font=script_small)
+        self.draw.text(self.coord(13,12.8), '0', font=script_small)
+        self.draw.text(self.coord(16,12.8), '1', font=script_small)
 
-        self.draw.text(self.coord(78.5,74), '4', font=script)
-        self.draw.text(self.coord(80.5,74), '1', font=script)
-        self.draw.text(self.coord(82.5,74), '3', font=script)
-        self.draw.text(self.coord(84.5,74), '0', font=script)
-        self.draw.text(self.coord(86.5,74), '0', font=script)
-        self.draw.text(self.coord(88.5,74), '0', font=script)
+        # Batter
+        self.draw.text(self.coord(78.5,73.4), '4', font=script)
+        self.draw.text(self.coord(80.5,73.4), '1', font=script)
+        self.draw.text(self.coord(82.5,73.4), '3', font=script)
+        self.draw.text(self.coord(84.5,73.4), '0', font=script)
+        self.draw.text(self.coord(86.5,73.4), '0', font=script)
+        self.draw.text(self.coord(88.5,73.4), '0', font=script)
 
-        self.draw.text(self.coord(10.5,10), 'N', font=script)
-        self.draw.text(self.coord(12.5,10), '4', font=script)
-        self.draw.text(self.coord(14.2,10), '27', font=script)
-        self.draw.text(self.coord(16.2,10), '12', font=script)
-        self.draw.text(self.coord(18.5,10), '3', font=script)
-        self.draw.text(self.coord(20.5,10), '4', font=script)
-        self.draw.text(self.coord(22.5,10), '0', font=script)
-        self.draw.text(self.coord(24.5,10), '0', font=script)
-        self.draw.text(self.coord(26.5,10), '0', font=script)
-        self.draw.text(self.coord(28.5,10), '0', font=script)
-        self.draw.text(self.coord(30.5,10), '0', font=script)
+        # Pitcher
+        self.draw.text(self.coord(10.5,9.4), 'N', font=script)
+        self.draw.text(self.coord(12.5,9.4), '4', font=script)
+        self.draw.text(self.coord(14.2,9.4), '27', font=script)
+        self.draw.text(self.coord(16.2,9.4), '12', font=script)
+        self.draw.text(self.coord(18.5,9.4), '3', font=script)
+        self.draw.text(self.coord(20.5,9.4), '4', font=script)
+        self.draw.text(self.coord(22.5,9.4), '0', font=script)
+        self.draw.text(self.coord(24.5,9.4), '0', font=script)
+        self.draw.text(self.coord(26.5,9.4), '0', font=script)
+        self.draw.text(self.coord(28.5,9.4), '0', font=script)
+        self.draw.text(self.coord(30.5,9.4), '0', font=script)
 
 
 if __name__ == '__main__':
