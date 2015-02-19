@@ -2,9 +2,12 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 class ScoreCard():
-    def __init__(self, file_name):
-        self.image = Image.open(os.path.abspath('blanks/' + file_name + '.gif'))
+    def __init__(self):
+        self.image = Image.open(os.path.abspath('blanks/blankCard.gif'))
         self.draw = ImageDraw.Draw(self.image)
+
+        self.lines()
+        self.text()
 
     def save(self, file_name='test'):
         del self.draw
@@ -53,7 +56,6 @@ class ScoreCard():
         self.draw.line([self.coord(x, start), self.coord(x, end)], width=4)
 
     def lines(self):
-        # Horizontal Lines
         self.horiz_solid_line(75)
         self.horiz_solid_line(74)
         self.horiz_dashed_line(72, end=12)
@@ -165,68 +167,22 @@ class ScoreCard():
         self.vert_solid_line(69, start=12, end=14)
         self.vert_solid_line(75, start=12, end=14)
 
-        # Boxes
+    def boxes(self, year, month, day, home, away, half):
         i = 0
-        for filename in sorted(os.listdir(os.path.abspath('games/2014_08_24/WSH_SF'))):
-            if filename[7:10]=='top':
+        for filename in sorted(os.listdir(os.path.abspath('games/%s_%s_%s/%s_%s' % (year, month, day, home, away)))):
+            if filename[7:10] == half:
                 col = int(filename[4:6])
                 row = i%9
                 x = (col + 1) * 6
                 y = 74 - (row * 6)
-                name = os.path.abspath('games/2014_08_24/WSH_SF/' + filename)
+                name = os.path.abspath('games/%s_%s_%s/%s_%s/%s' % (year, month, day, home, away, filename))
                 box = Image.open(name)
                 self.image.paste(box, self.coord(x,y))
                 i += 1
 
     def text(self):
-        # Fonts
         font_big = self.get_font('Slabo', 80)
         font_small = self.get_font('Slabo', 42)
-        script = self.get_font('JustAnotherHand', 70)
-        script_big = self.get_font('JustAnotherHand', 80)
-        script_small = self.get_font('JustAnotherHand', 40)
-
-        # Text
-        self.draw.text(self.coord(7,77.5), 'Nationals', font=script_big)
-
-        self.draw.text(self.coord(0,73.4), '2', font=script)
-        self.draw.text(self.coord(2.5,73.4), 'Gordon', font=script)
-        self.draw.text(self.coord(10.5,73.4), '8', font=script)
-
-        self.draw.text(self.coord(0,67.4), '6', font=script)
-        self.draw.text(self.coord(2.5,67.4), 'Crawford', font=script)
-        self.draw.text(self.coord(10.5,67.4), '5', font=script)
-
-        self.draw.text(self.coord(0,61.4), '28', font=script)
-        self.draw.text(self.coord(2.5,61.4), 'Ramirez', font=script)
-        self.draw.text(self.coord(10.5,61.4), '9', font=script)
-
-        self.draw.text(self.coord(0,55.4), '25', font=script)
-        self.draw.text(self.coord(2.5,55.4), 'Kemp', font=script)
-        self.draw.text(self.coord(10.5,55.4), '3', font=script)
-
-        self.draw.text(self.coord(0,49.4), '20', font=script)
-        self.draw.text(self.coord(2.5,49.4), 'Ethier', font=script)
-        self.draw.text(self.coord(10.5,49.4), '6', font=script)
-
-        self.draw.text(self.coord(0,43.4), '8', font=script)
-        self.draw.text(self.coord(2.5,43.4), 'Uribe', font=script)
-        self.draw.text(self.coord(10.5,43.4), '4', font=script)
-
-        self.draw.text(self.coord(0,37.4), '15', font=script)
-        self.draw.text(self.coord(2.5,37.4), 'Van Slyke', font=script)
-        self.draw.text(self.coord(10.5,37.4), '7', font=script)
-
-        self.draw.text(self.coord(0,31.4), '41', font=script)
-        self.draw.text(self.coord(2.5,31.4), 'Butera', font=script)
-        self.draw.text(self.coord(10.5,31.4), '2', font=script)
-
-        self.draw.text(self.coord(0,25.4), '27', font=script)
-        self.draw.text(self.coord(2.5,25.4), 'Kershaw', font=script)
-        self.draw.text(self.coord(10.5,25.4), '1', font=script)
-
-        self.draw.text(self.coord(0,9.4), '27', font=script)
-        self.draw.text(self.coord(2.5,9.4), 'Zimmermann', font=script)
 
         self.draw.text(self.coord(1,78), 'Team:', font=font_big)
 
@@ -271,36 +227,63 @@ class ScoreCard():
         self.draw.text(self.coord(28.3,11.1), 'HP', font=font_small)
         self.draw.text(self.coord(30,11.1), 'BLK', font=font_small)
 
-        # Inning
-        self.draw.text(self.coord(13,13.8), '2', font=script_small)
-        self.draw.text(self.coord(16,13.8), '3', font=script_small)
-        self.draw.text(self.coord(13,12.8), '0', font=script_small)
-        self.draw.text(self.coord(16,12.8), '1', font=script_small)
+    def player(self, order, name, number, position):
+        if order:
+            script = self.get_font('JustAnotherHand', 70)
 
-        # Batter
-        self.draw.text(self.coord(78.5,73.4), '4', font=script)
-        self.draw.text(self.coord(80.5,73.4), '1', font=script)
-        self.draw.text(self.coord(82.5,73.4), '3', font=script)
-        self.draw.text(self.coord(84.5,73.4), '0', font=script)
-        self.draw.text(self.coord(86.5,73.4), '0', font=script)
-        self.draw.text(self.coord(88.5,73.4), '0', font=script)
+            y = 79.4 - (float(order) * 6.0)
 
-        # Pitcher
-        self.draw.text(self.coord(10.5,9.4), 'N', font=script)
-        self.draw.text(self.coord(12.5,9.4), '4', font=script)
-        self.draw.text(self.coord(14.2,9.4), '27', font=script)
-        self.draw.text(self.coord(16.2,9.4), '12', font=script)
-        self.draw.text(self.coord(18.5,9.4), '3', font=script)
-        self.draw.text(self.coord(20.5,9.4), '4', font=script)
-        self.draw.text(self.coord(22.5,9.4), '0', font=script)
-        self.draw.text(self.coord(24.5,9.4), '0', font=script)
-        self.draw.text(self.coord(26.5,9.4), '0', font=script)
-        self.draw.text(self.coord(28.5,9.4), '0', font=script)
-        self.draw.text(self.coord(30.5,9.4), '0', font=script)
+            self.draw.text(self.coord(0.5, y), number, font=script)
+            self.draw.text(self.coord(2.5, y), name, font=script)
+            self.draw.text(self.coord(10.5, y), str(position), font=script)
+
+    def teamName(self, name):
+        script_big = self.get_font('JustAnotherHand', 80)
+
+        self.draw.text(self.coord(7, 77.5), name, font=script_big)
+
+    def inningTotals(self, inn, runs, hits, errs, lob):
+        script_small = self.get_font('JustAnotherHand', 40)
+
+        xa = 7 + (inn * 6)
+        xb = 10 + (inn * 6)
+
+        self.draw.text(self.coord(xa, 13.8), runs, font=script_small)
+        self.draw.text(self.coord(xb, 13.8), hits, font=script_small)
+        self.draw.text(self.coord(xa, 12.8), errs, font=script_small)
+        self.draw.text(self.coord(xb, 12.8), lob, font=script_small)
+
+    def batterTotals(self, order, ab, run, hit, rbi, bb, so):
+        script = self.get_font('JustAnotherHand', 70)
+
+        y = 79.4 - (float(order) * 6.0)
+
+        self.draw.text(self.coord(78.5, y), ab, font=script)
+        self.draw.text(self.coord(80.5, y), run, font=script)
+        self.draw.text(self.coord(82.5, y), hit, font=script)
+        self.draw.text(self.coord(84.5, y), rbi, font=script)
+        self.draw.text(self.coord(86.5, y), bb, font=script)
+        self.draw.text(self.coord(88.5, y), so, font=script)
+
+    def pitcherTotals(self, num, decision, ip, ab, so, bb, hits, runs, er, wp, hp, blk):
+        script = self.get_font('JustAnotherHand', 70)
+
+        y = 11.4 - (float(num) * 2.0)
+
+        self.draw.text(self.coord(10.5,9.4), decision, font=script)
+        self.draw.text(self.coord(12.5,9.4), ip, font=script)
+        self.draw.text(self.coord(14.2,9.4), ab, font=script)
+        self.draw.text(self.coord(16.2,9.4), so, font=script)
+        self.draw.text(self.coord(18.5,9.4), bb, font=script)
+        self.draw.text(self.coord(20.5,9.4), hits, font=script)
+        self.draw.text(self.coord(22.5,9.4), runs, font=script)
+        self.draw.text(self.coord(24.5,9.4), er, font=script)
+        self.draw.text(self.coord(26.5,9.4), wp, font=script)
+        self.draw.text(self.coord(28.5,9.4), hp, font=script)
+        self.draw.text(self.coord(30.5,9.4), blk, font=script)
 
 
 if __name__ == '__main__':
-    card = ScoreCard('blankCard')
-    card.lines()
-    card.text()
+    card = ScoreCard()
+    card.boxes('2014', '08', '24', 'WSH', 'SF', 'bot')
     card.save('card')

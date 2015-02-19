@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from draw.card import ScoreCard
 from draw.plays import ScoreBox
 import xml.etree.ElementTree as ET
 import os
@@ -8,51 +9,55 @@ import bs4
 import re
 
 class Team(object):
-    def __init__(self, code, abbrev, id, name, name_full, name_brief):
-        self.code = code
-        self.abbrev = abbrev
+    def __init__(self, id, name, type):
         self.id = id
         self.name = name
-        self.name_full = name_full
-        self.name_brief = name_brief
+        self.type = type
+        self.players = {}
+        self.scoreCard = ScoreCard()
+        self.scoreCard.teamName(self.name)
 
 class Player(object):
-    def __init__(self, id, num, box, pos, team, first, last):
+    def __init__(self, id, num, box, first, last, team, pos, order):
         self.id = id
         self.num = num
         self.boxname = box
         self.position = pos
-        self.team = team
         self.first = first
         self.last = last
+        self.team = team
+        self.order = order
 
 class Play(object):
     pass
 
 class Game(object):
-    def __init__(self, home, away, location):
-        self.home = home
-        self.away = away
+    def __init__(self, year, month, day, location):
+        self.year = year
+        self.month = month
+        self.day = day
         self.location = location
+        self.home = None
+        self.away = None
 
 def pos(string):
-    if string == 'pitcher':
+    if string == 'pitcher' or string == 'P':
         return 1
-    elif string == 'catcher':
+    elif string == 'catcher' or string == 'C':
         return 2
-    elif string == 'first baseman':
+    elif string == 'first baseman' or string == '1B':
         return 3
-    elif string == 'second baseman':
+    elif string == 'second baseman' or string == '2B':
         return 4
-    elif string == 'third baseman':
+    elif string == 'third baseman' or string == '3B':
         return 5
-    elif string == 'shortstop':
+    elif string == 'shortstop' or string == 'SS':
         return 6
-    elif string == 'left fielder':
+    elif string == 'left fielder' or string == 'LF':
         return 7
-    elif string == 'center fielder':
+    elif string == 'center fielder' or string == 'CF':
         return 8
-    elif string == 'right fielder':
+    elif string == 'right fielder' or string == 'RF':
         return 9
     else:
         return 0
@@ -87,7 +92,6 @@ def parse_event(atbat, box):
 
     batter_num = get_player(id=atbat.attrib['batter']).num
     for box, play in events.iteritems():
-        print play
         if 'scores.' in play:
             box.first_second()
             box.second_third()
@@ -187,10 +191,6 @@ def parse_event(atbat, box):
 if __name__ == '__main__':
     base_url = 'http://gd2.mlb.com/components/game/mlb/'
 
-    # year = raw_input("What year?")
-    # month = raw_input("What month?")
-    # day = raw_input("What day?")
-    # day_url = 'http://gd2.mlb.com/components/game/mlb/year_%s/month_%s/day_%s/' % (year, month, day)
     args = {'year': '2014', 'month': '08', 'day': '24'}
     day_url = base_url + 'year_2014/month_08/day_24/'
     soup = bs4.BeautifulSoup(urllib2.urlopen(day_url))
@@ -210,26 +210,43 @@ if __name__ == '__main__':
     players_root = ET.fromstring(players_xml)
 
     location = game_root.findall('stadium')[0].attrib['location']
-    for team in game_root.iter('team'):
-        a = team.attrib
-        t = Team(a['code'], a['abbrev'], a['id'], a['name'], a['name_full'], a['name_brief'])
-        if a['type'] == 'home':
-            home = t
-        elif a['type'] == 'away':
-            away = t
-    g = Game(home, away, location)
-
-    def get_player(id=None, num=None, first=None, last=None):
-        for player in players_root.iter('player'):
-            a = player.attrib
-            if id == a['id'] or num == a['num'] or first == a['first'] or last == a['last']:
-                if a['parent_team_id'] == home.id:
-                    team = home
-                else:
-                    team = away
-                return Player(a['id'], a['num'], a['boxname'], a['current_position'], team, a['first'], a['last'])
-
+    game = Game(args['year'], args['month'], args['day'], location)
+    players = {}
     boxes = {}
+
+    def get_player(id=None, last=None):
+        if id and id in players:
+            return players[id]
+        elif last:
+            for id in players:
+                if last == players[id].last:
+                    return players[id]
+
+    for team in players_root.iter('team'):
+        a = team.attrib
+        t = Team(a['id'], a['name'], a['type'])
+        if t.type == 'home':
+            game.home = t
+        else:
+            game.away = t
+
+        for player in team.iter('player'):
+            a = player.attrib
+            order = None
+            if 'bat_order' in a:
+                order = a['bat_order']
+
+            position = None
+            if 'game_position' in a:
+                position = a['game_position']
+            elif 'current_position' in a:
+                position = a['current_position']
+            elif 'position' in a:
+                position = a['position']
+
+            p = Player(a['id'], a['num'], a['boxname'], a['first'], a['last'], t, position, order)
+            players[p.id] = p
+            t.scoreCard.player(p.order, p.boxname, p.num, pos(p.position))
 
     for inning in game_events_root:
         if inning.tag == 'inning':
@@ -252,7 +269,7 @@ if __name__ == '__main__':
         for half,batters in halves.items():
             for batter,atbats in batters.items():
                 for num,box in atbats.items():
-                    args.update({'inn': str(inn).zfill(2), 'half': half, 'num': num.zfill(3), 'home': home.abbrev, 'away': away.abbrev})
+                    args.update({'inn': str(inn).zfill(2), 'half': half, 'num': num.zfill(3), 'home': game.home.id, 'away': game.away.id})
 
                     games_dir = 'games'
                     day_dir = '%(year)s_%(month)s_%(day)s' % args
@@ -266,3 +283,9 @@ if __name__ == '__main__':
                         os.makedirs(dir_path)
 
                     box.save(file_name=file_path)
+
+    game.away.scoreCard.boxes(game.year, game.month, game.day, game.home.id, game.away.id, 'top')
+    game.home.scoreCard.boxes(game.year, game.month, game.day, game.home.id, game.away.id, 'bot')
+
+    game.away.scoreCard.save('%(year)s_%(month)s_%(day)s_%(away)s' % args)
+    game.home.scoreCard.save('%(year)s_%(month)s_%(day)s_%(home)s' % args)

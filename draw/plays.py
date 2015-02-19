@@ -116,14 +116,14 @@ class ScoreBox():
         if num > 2:
             num = 2
         for i in xrange(num):
-            self.draw.line([self.coord_10(10-i,1), self.coord_10(9-i,2)], width=2)
+            # self.draw.line([self.coord_10(10-i,1), self.coord_10(9-i,2)], width=2)
             self.draw.line([self.coord_10(9-i,1), self.coord_10(10-i,2)], width=2)
 
     def balls(self, num):
         if num > 3:
             num = 3
         for i in xrange(num):
-            self.draw.line([self.coord_10(10-i,0), self.coord_10(9-i,1)], width=2)
+            # self.draw.line([self.coord_10(10-i,0), self.coord_10(9-i,1)], width=2)
             self.draw.line([self.coord_10(9-i,0), self.coord_10(10-i,1)], width=2)
 
     def main(self):
